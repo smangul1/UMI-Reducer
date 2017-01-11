@@ -27,8 +27,7 @@ ap.add_argument('outbam', help='Output file to save reads after collapsing PCR d
 #ap.add_argument('--testN', type=int,
 #                help='Run a test using only the first N features, and then '
 #                'print out some example feature IDs and their attributes')
-#ap.add_argument('--force', action='store_true',
-#                help='Overwrite an existing database')
+ap.add_argument('--m', action='store_true',help='Save multi-mapped reads')
 
 #cmd https://gist.github.com/daler/ec481811a44b3aa469f3
 
@@ -69,6 +68,9 @@ dict= {}
 
 mappedReads=[]
 numberReadsUnique=0
+
+numberReadsUniquePlusMultiMapped=0
+
 numberReadsUnique_covGreated1=0
 numberReadsUnique_filtered=0
 readLength=[]
@@ -90,21 +92,34 @@ outfile = pysam.AlignmentFile(out, "wb", header=bam_header)
 
 
 
+
+
+
+
+
 for chr in chr_list:
     dict.clear()
     position[:]=[]
     print "----------chr",chr
     for read in samfile.fetch(chr):
         mappedReads.append(read.query_name)
-        if read.mapq==50:
-            numberReadsUnique+=1
+        
+        
+        if args.m:
+            if read.mapq==50:
+                numberReadsUnique+=1
+            numberReadsUniquePlusMultiMapped+=1
             position.append(read.reference_start)
             readLength.append(len(read.query_sequence))
+        else:
+            if read.mapq==50:
+                numberReadsUnique+=1
+                position.append(read.reference_start)
+                readLength.append(len(read.query_sequence))
 
 
-
-
-
+    print "numberReadsUnique",numberReadsUnique
+    print "numberReadsUniquePlusMultiMapped",numberReadsUniquePlusMultiMapped
 
 
 
@@ -188,6 +203,9 @@ nr=[]
 nr.append(out.split('.')[0])
 nr.append(len(set(mappedReads)))
 nr.append(numberReadsUnique)
+
+nr.append(numberReadsUniquePlusMultiMapped)
+
 nr.append(numberReadsUnique_filtered)
 
 
