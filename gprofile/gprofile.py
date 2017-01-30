@@ -463,7 +463,7 @@ for chr in chr_list:
             if flagMulti==0: #read is not multi-mapped
                 if feature[0]=='CDS':
                     nCDS+=1
-                    print "CDS"
+                    #print "CDS"
                 elif feature[0]=='INTRON':
                     nIntron+=1
                 elif feature[0]=='UTR3':
