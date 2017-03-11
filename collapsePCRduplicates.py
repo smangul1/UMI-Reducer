@@ -127,10 +127,16 @@ for chr in chr_list:
     position_all_uniq+=position
     print "Number of position with #reads staring >=1", len(position)
 
-    
+    count=0
+
+    print  "Processing", len(counter_chr.items()), "items"
+
     for key,val in counter_chr.items():
         #print key,val
-
+        if count%1000=1:
+            print count
+        count+=1
+        
         if val==1:
             for read in samfile.fetch(chr,key,key+1):
                 if read.reference_start==key:
