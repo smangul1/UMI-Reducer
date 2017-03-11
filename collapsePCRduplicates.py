@@ -92,7 +92,7 @@ outfile = pysam.AlignmentFile(out, "wb", header=bam_header)
 
 
 
-
+print "Open ",bam, "via pysam"
 
 
 
