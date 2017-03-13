@@ -81,7 +81,7 @@ after=0
 
 
 
-
+readSet=set()
 
 
 bam_header = pysam.Samfile(bam, 'rb').header
@@ -133,7 +133,7 @@ for chr in chr_list:
 
     for key,val in counter_chr.items():
         #print key,val
-        if count%1000==1:
+        if count%10000==1:
             print count
         count+=1
         
@@ -143,6 +143,7 @@ for chr in chr_list:
                     outfile.write(read)
                     readLength_filtered.append(len(read.query_sequence))
                     numberReadsUnique_filtered+=1
+                    readSet.add(read.query_name)
      
     
 
@@ -177,6 +178,7 @@ for chr in chr_list:
                         numberReadsUnique_filtered+=1
                         readLength_filtered.append(len(Read[i].query_sequence))
                         notsetReads.add(Read[i].query_name.split("_")[3]+"_"+Read[i].query_sequence)
+                        readSet.add(Read[i].query_name)
 
 
 
@@ -196,6 +198,8 @@ header.append('sample')
 header.append('Number of mapped reads')
 header.append('Number of reads mapped to unique location (UNIQUE reads)')
 header.append('Number of reads after collapsing PCR dublicated')
+header.append('Number of reads after collapsing PCR dublicated (collapsing dublicates ....)')
+
 
 nr=[]
 
@@ -205,6 +209,7 @@ nr.append(numberReadsUnique)
 
 
 nr.append(numberReadsUnique_filtered)
+nr.append(len(readSet))
 
 
 
@@ -222,7 +227,6 @@ with open(stat_f, 'w') as fp:
 counter=collections.Counter(position_all_uniq)
 position_all_uniq=set(position_all_uniq)
 print "Number of position with #reads staring >=1", len(position_all_uniq)
-
 
 
 
@@ -263,12 +267,12 @@ for key,val in counter_length.items():
     xbins2.append(val)
     x2.append(key)
 
-plot2=out.split('.')[0]+'.readLengthMultiMappedReadsRemoved.png'
+plot2=out.split('.')[0]+'.readLengthBeforePCRduplicates.png'
 print "save to",plot2
 
 
 
-plt.title('Length of after removing reads mapped to multiple locations in the genome')
+plt.title('Length before collapsing PCR duplicates')
 plt.bar(x2,xbins2)
 plt.savefig(plot2)
 
