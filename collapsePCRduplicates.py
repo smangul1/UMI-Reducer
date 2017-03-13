@@ -197,8 +197,8 @@ header=[]
 header.append('sample')
 header.append('Number of mapped reads')
 header.append('Number of reads mapped to unique location (UNIQUE reads)')
-header.append('Number of reads after collapsing PCR dublicated')
-header.append('Number of reads after collapsing PCR dublicated (collapsing dublicates ....)')
+header.append('Number of reads alligments after collapsing PCR dublicated (an aligment may include several copies of reads) ')
+header.append('Number of reads after collapsing PCR dublicated (each read is present once) ')
 
 
 nr=[]
