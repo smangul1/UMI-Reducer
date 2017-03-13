@@ -133,7 +133,7 @@ for chr in chr_list:
 
     for key,val in counter_chr.items():
         #print key,val
-        if count%1000=1:
+        if count%1000==1:
             print count
         count+=1
         
@@ -148,45 +148,38 @@ for chr in chr_list:
 
 
 
+
         elif val>1:
+            setReads=set()
+            setReads.clear()
+    
+            if val>1000:
+                print val, chr,key
             Read=[]
             Read[:]=[]
             for read in samfile.fetch(chr,key,key+1):
                 if read.reference_start==key:
                     Read.append(read)
-            
-        #print key,val
-           
-            
-            
-            exclude_list=[]
-            exclude_list[:]=[]
-            
-            for i in range(0,val):
-                for j in range(0,val):
-                    if i<j:
-                        #print i,j
-                        #print Read[dict[key]][i].query_name, Read[dict[key]][i].query_sequence
-                        #print Read[dict[key]][j].query_name, Read[dict[key]][j].query_sequence
+                    setReads.add(read.query_name.split("_")[3]+"_"+read.query_sequence)
 
-                        #print Read[dict[key]][0].query_name
-                        #print Read[dict[key]][0].query_name.split("_")[3]+"_"+Read[dict[key]][0].query_sequence
-                        if Read[i].query_name.split("_")[3]+"_"+Read[i].query_sequence==Read[j].query_name.split("_")[3]+"_"+Read[j].query_sequence:
-                            #print i,j
-                            exclude_list.append(j)
-                            #print "EQUAL"
-                            #print Read[dict[key]][i].query_name, Read[dict[key]][i].query_sequence
-                            #print Read[dict[key]][j].query_name, Read[dict[key]][j].query_sequence
-                            #print "to exlude",j
-        
-        
+        #print key,val
+
+
+            
+            
+
+            notsetReads=set()
+            notsetReads.clear()
+            numberReadsUnique_covGreated1+=len(setReads)
             for i in range(0,val):
-                numberReadsUnique_covGreated1+=1
-                if i not in exclude_list:
-                    #print "to include",i
-                    readLength_filtered.append(len(Read[i].query_sequence))
-                    numberReadsUnique_filtered+=1
-                    outfile.write(Read[i])
+                if Read[i].query_name.split("_")[3]+"_"+Read[i].query_sequence in setReads and Read[i].query_name.split("_")[3]+"_"+Read[i].query_sequence not in notsetReads:
+                        outfile.write(Read[i])
+                        numberReadsUnique_filtered+=1
+                        readLength_filtered.append(len(Read[i].query_sequence))
+                        notsetReads.add(Read[i].query_name.split("_")[3]+"_"+Read[i].query_sequence)
+
+
+
                     
 
 outfile.close()
@@ -201,7 +194,7 @@ header=[]
 
 header.append('sample')
 header.append('Number of mapped reads')
-header.append('Number of reads after removing reads mapped to multiple locations in the genome')
+header.append('Number of reads mapped to unique location (UNIQUE reads)')
 header.append('Number of reads after collapsing PCR dublicated')
 
 nr=[]
@@ -210,7 +203,6 @@ nr.append(out.split('.')[0])
 nr.append(len(set(mappedReads)))
 nr.append(numberReadsUnique)
 
-nr.append(numberReadsUniquePlusMultiMapped)
 
 nr.append(numberReadsUnique_filtered)
 
