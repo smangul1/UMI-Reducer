@@ -31,7 +31,7 @@ echo "samtools index ${2}/${line}.bam">>run_${line}.sh
 echo "python ${dirSource}/collapsePCRduplicates.py ${2}/${line}.bam ${dir}/${line}/${line}_PCRDuplicatesCollapsed.bam">>run_${line}.sh
 echo ". /u/local/Modules/default/init/modules.sh">>run_${line}.sh
 echo "module load samtools">>run_${line}.sh
-echo "samtools sort ${dir}/${line}/${line}_PCRDuplicatesCollapsed.bam ${dir}/${line}/${line}_PCRDuplicatesCollapsed_sort">>run_${line}.sh
+echo "samtools sort ${dir}/${line}/${line}_PCRDuplicatesCollapsed.bam -o ${dir}/${line}/${line}_PCRDuplicatesCollapsed_sort.bam">>run_${line}.sh
 echo "samtools index ${dir}/${line}/${line}_PCRDuplicatesCollapsed_sort.bam">>run_${line}.sh
 #echo "rm -rf ${dir}/${line}/${line}_filtered.bam">>run_${line}.sh 
 echo "rm -rf ${dir}/${line}/${line}_PCRDuplicatesCollapsed.bam">>run_${line}.sh

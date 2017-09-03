@@ -45,6 +45,7 @@ if not args.mouse:
         chr_list.append(str(i))
     chr_list.append('X')
     chr_list.append('Y')
+    chr_list.append('MT')
 
     geneCoordinates_file=os.path.dirname(os.path.realpath(__file__))+'/annotations/human/bedPrepared/geneCoordinates_GRCh37.bed'
 
@@ -54,6 +55,7 @@ elif args.mouse:
         chr_list.append(str(i))
     chr_list.append('X')
     chr_list.append('Y')
+    chr_list.append('MT')
     geneCoordinates_file=os.path.dirname(os.path.realpath(__file__))+'/annotations/mouse/bedPrepared/geneCoordinates_NCBIM37.bed'
 
 
@@ -99,6 +101,7 @@ with open(geneCoordinates_file,'r') as f:
             geneName=line[3]
             geneNameSet[chr].add(geneName)
             geneIDSet[chr].add(geneID)
+            dictGeneNames[geneName]=geneID
 
 
 for c in chr_list:
@@ -107,10 +110,16 @@ for c in chr_list:
 print "Look into ", args.dir
 
 
+
+
 for f in os.listdir(dirOutPerCategory):
-    if "genomicFeature" in f:
+    if f.endswith(".genomicFeature"):
         base=os.path.basename(f)
-        prefix=os.path.splitext(base)[0].split('.')[0]
+        if "MT.genomicFeature" in f:
+           prefix=os.path.splitext(base)[0].split('.MT.genomicFeature')[0].replace('.MT','') # not sure why we need replace. But somehow split works wired 09/01/2017
+
+
+
 
 
 abundanceGene={}
@@ -133,6 +142,7 @@ readDict={}
 # 1. read is mapped to multiple location, all those locations are within different genes
 
 
+reads_set_MT=set()
 
 for chr in chr_list:
     
@@ -140,6 +150,11 @@ for chr in chr_list:
         abundanceGene[g]=0
     
     #f_file with reads mapped to multiple genes, i.e. multiple lines per gene
+    
+    print "dirOutPerCategory",dirOutPerCategory
+    print "prefix",prefix
+    print "chr",chr
+    
     f_file=dirOutPerCategory+prefix+"."+chr+".genomicFeature"
 
     #f_file2 with reads, where one location was choosen for read randomly
@@ -156,12 +171,14 @@ for chr in chr_list:
         reader.next()
         
         for line in reader:
-            
+            read=line[0]
             geneID=line[3]
             flagM=int(line[5])
             readName=line[0]
-            
             mReadsSet.add(readName)
+
+            if chr=="MT":
+                reads_set_MT.add(read)
 
 
     for r in mReadsSet:
@@ -284,16 +301,30 @@ for chr in chr_list:
 
 
 
+f_summary=dirOutPerCategory+prefix+"_summary_per_feature.csv"
+fileS=open(f_summary,"w")
+fileS.write("chr,nJunction,nCDS,nUTR3,nUTR5,nUTR_,nIntron")
+fileS.write("\n")
 
-
-
+nJunction_g=0
+nCDS_g=0
+nUTR3_g=0
+nUTR5_g=0
+nUTR_g=0
+nIntron_g=0
 
 
 
 #new stuff added by Sarah request
 #updated before releasing UMI-Reducer 01/11/2017
 
+intergenicReads=set()
+
 for chr in chr_list:
+    
+    
+    
+    
     
     if not os.path.exists(dirOutPerCategory+"/perGeneSummary/"):
         os.makedirs(dirOutPerCategory+"/perGeneSummary/")
@@ -304,12 +335,18 @@ for chr in chr_list:
     f_fileOut=dirOutPerCategory+"/perGeneSummary/"+prefix+"."+chr+".perGeneSummary"
     
     print "Processing ",f_file
+
+
+
+
+
     genes=set()
 
     with open(f_file,'r') as f:
         
         reader=csv.reader(f)
         for line in reader:
+            
             if len(line)==6:
                 genes.add(line[4])
 
@@ -329,6 +366,7 @@ for chr in chr_list:
         for line in reader:
             
             if len(line)==6:
+                read=line[0]
                 geneName=line[4]
                 geneNameSetCurrent.add(geneName)
                 
@@ -349,26 +387,64 @@ for chr in chr_list:
                     dict[geneName][4]+=1
                 elif category=="INTRON":
                     dict[geneName][5]+=1
+                else:
+                    intergenicReads.add(read)
 
     outfile = open(f_fileOut, 'w' )
 
 
     outfile.write("geneName,chr,nJunction,nCDS,nUTR3,nUTR5,nUTR_,nIntron\n")
+
+    nJunction=0
+    nCDS=0
+    nUTR3=0
+    nUTR5=0
+    nUTR_=0
+    nIntron=0
     
+
     
+
+
     for g in geneNameSet[chr]:
         if g in geneNameSetCurrent:
             value=dict[g]
-            outfile.write(g+","+chr+","+str(value[0])+","+str(value[1])+","+str(value[2])+","+str(value[3])+","+str(value[4])+","+str(value[5])+"\n")
+            
+            geneId=dictGeneNames[g]
+            
+            
+            
+            nJunction+=value[0]
+            nCDS+=value[1]
+            nUTR3+=value[2]
+            nUTR5+=value[3]
+            nUTR_+=value[4]
+            nIntron+=value[5]
+            
+            
+            
+            outfile.write(g+","+chr+","+str(value[0])+","+str(value[1])+","+str(value[2])+","+str(value[3])+","+str(value[4])+","+str(value[5])+","+str(sum(value))+","+str(abundanceGene[geneId])+"\n")
         else:
             outfile.write(g+","+chr+","+"0,0,0,0,0,0\n")
 
     outfile.close()
 
 
+    nJunction_g+=nJunction
+    nCDS_g+=nCDS
+    nUTR3_g+=nUTR3
+    nUTR5_g+=nUTR5
+    nUTR_g+=nUTR_
+    nIntron_g+=nIntron
 
 
+    if chr!="MT":
+        fileS.write(chr+","+str(nJunction)+","+str(nCDS)+","+str(nUTR3)+","+str(nUTR5)+","+str(nUTR_)+","+str(nIntron))
+        fileS.write("\n")
 
+
+fileS.write("Total,"+str(nJunction_g)+","+str(nCDS_g)+","+str(nUTR3_g)+","+str(nUTR5_g)+","+str(nUTR_g)+","+str(nIntron_g))
+fileS.write("\n")
 
 
 

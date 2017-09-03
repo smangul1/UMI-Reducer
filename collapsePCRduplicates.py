@@ -24,13 +24,7 @@ def editDistance(s1,s2):
 ap = argparse.ArgumentParser()
 ap.add_argument('inbam', help='Mapped reads in bam format')
 ap.add_argument('outbam', help='Output file to save reads after collapsing PCR duplicates')
-#ap.add_argument('--testN', type=int,
-#                help='Run a test using only the first N features, and then '
-#                'print out some example feature IDs and their attributes')
 ap.add_argument('--m', action='store_true',help='Save multi-mapped reads')
-
-#cmd https://gist.github.com/daler/ec481811a44b3aa469f3
-
 args = ap.parse_args()
 
 
@@ -197,7 +191,6 @@ header=[]
 header.append('sample')
 header.append('Number of mapped reads')
 header.append('Number of reads mapped to unique location (UNIQUE reads)')
-header.append('Number of reads alligments after collapsing PCR dublicated (an aligment may include several copies of reads) ')
 header.append('Number of reads after collapsing PCR dublicated (each read is present once) ')
 
 
@@ -206,9 +199,6 @@ nr=[]
 nr.append(out.split('.')[0])
 nr.append(len(set(mappedReads)))
 nr.append(numberReadsUnique)
-
-
-nr.append(numberReadsUnique_filtered)
 nr.append(len(readSet))
 
 
@@ -277,7 +267,7 @@ plt.bar(x2,xbins2)
 plt.savefig(plot2)
 
 
-
+samfile.close()
 
 
 print "DONE!"

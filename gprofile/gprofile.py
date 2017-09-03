@@ -95,20 +95,20 @@ def whichFeature(read,chr):
     elif tag_utr3+tag_utr5>1:
         x=find_list_utr3[0][0]
         y=find_list_utr3[0][1]
-        return ('UTR_',geneUTR3[(x,y)])
+        return ('UTR_',geneUTR3[(chr,x,y)])
     elif tag_cds==1:
         
         x=find_list_cds[0][0]
         y=find_list_cds[0][1]
-        return ('CDS',geneCDS[(x,y)])
+        return ('CDS',geneCDS[(chr,x,y)])
     elif tag_utr3==1:
         x=find_list_utr3[0][0]
         y=find_list_utr3[0][1]
-        return ('UTR3',geneUTR3[(x,y)])
+        return ('UTR3',geneUTR3[(chr,x,y)])
     elif tag_utr5==1:
         x=find_list_utr5[0][0]
         y=find_list_utr5[0][1]
-        return ('UTR5',geneUTR5[(x,y)])
+        return ('UTR5',geneUTR5[(chr,x,y)])
     elif tag_cds+tag_utr3+tag_utr5==0:
         if len(find_list_intron)>0:
             x=find_list_intron[0][0]
@@ -144,13 +144,20 @@ def find(start, end, tree):
     '''
 
 
+#==============================================================================================================================================
+#==============================================================================================================================================
+#==============================================================================================================================================
+#==============================================================================================================================================
+#==============================================================================================================================================
+#==============================================================================================================================================
+
+
 ap = argparse.ArgumentParser()
 ap.add_argument('bam', help='sorted bam file with mapped reads')
 ap.add_argument('out', help='file to save the number of reads per genome category')
 ap.add_argument("--perCategory", help="reports the assigment for each read. A separate file per chromosome will be created",action="store_true")
 ap.add_argument("--mouse", help="Use mouse genome annotations (NCBIM37). Default is human",action="store_true")
 ap.add_argument("--multi", help="Categories all copies of multi-mapped reads, they will have a special flag to futher assign according to transcript abundance ",action="store_true")
-
 args = ap.parse_args()
 
 
@@ -161,6 +168,9 @@ args = ap.parse_args()
 
 
 ##About Interval trees  https://www.biostars.org/p/99/
+
+print "Open bam file",args.bam
+bamfile = pysam.Samfile(args.bam, "rb")
 
 
 
@@ -179,6 +189,7 @@ if not args.mouse:
         chr_list.append(str(i))
     chr_list.append('X')
     chr_list.append('Y')
+    chr_list.append('MT')
 
     utr3_file=os.path.dirname(os.path.realpath(__file__))+'/annotations/human/bedPrepared/UTR3_GRCh37_prepared.bed'
     utr5_file=os.path.dirname(os.path.realpath(__file__))+'/annotations/human/bedPrepared/UTR5_GRCh37_prepared.bed'
@@ -191,6 +202,7 @@ elif args.mouse:
         chr_list.append(str(i))
     chr_list.append('X')
     chr_list.append('Y')
+    chr_list.append('MT')
     utr3_file=os.path.dirname(os.path.realpath(__file__))+'/annotations/mouse/bedPrepared/UTR3_NCBIM37_prepared.bed'
     utr5_file=os.path.dirname(os.path.realpath(__file__))+'/annotations/mouse/bedPrepared/UTR5_NCBIM37_prepared.bed'
     cds_file=os.path.dirname(os.path.realpath(__file__))+'/annotations/mouse/bedPrepared/CDS_NCBIM37_prepared.bed'
@@ -222,11 +234,6 @@ if args.perCategory:
         outfile = open(f_file, 'w' )
         outFile[chr]=open(f_file, 'w' )
         outFile[chr].write('readName,chr,category, geneID, geneName, flag_multiMapped\n')
-    #MT
-    f_file=dirOutPerCategory+prefix+"."+'MT'+".genomicFeature"
-    outfile = open(f_file, 'w' )
-    outFile['MT']=open(f_file, 'w' )
-    outFile['MT'].write('readName,chr,category, geneID,geneName,flag_multiMapped\n')
 
 
 
@@ -241,7 +248,7 @@ if args.perCategory:
 
 
 
-#DATA STRUCTURE
+#DATA STRUCTURE - per chr
 tree_utr3={}
 tree_utr5={}
 tree_cds={}
@@ -284,7 +291,7 @@ with open(utr3_file,'r') as f:
             y=int(line[2])
             geneID=line[3]
             geneName=line[4]
-            geneUTR3[(x,y)]=(geneID,geneName)
+            geneUTR3[(chr,x,y)]=(geneID,geneName)
             tree_utr3[chr]=tree_utr3[chr].insert( x, y )
 
 
@@ -310,7 +317,7 @@ with open(utr5_file,'r') as f:
             y=int(line[2])
             geneID=line[3]
             geneName=line[4]
-            geneUTR5[(x,y)]=(geneID,geneName)
+            geneUTR5[(chr,x,y)]=(geneID,geneName)
             tree_utr5[chr]=tree_utr5[chr].insert( x, y )
 
 
@@ -329,7 +336,7 @@ with open(cds_file,'r') as f:
             y=int(line[2])
             geneID=line[3]
             geneName=line[4]
-            geneCDS[(x,y)]=(geneID,geneName)
+            geneCDS[(chr,x,y)]=(geneID,geneName)
             tree_cds[chr]=tree_cds[chr].insert( x, y )
 
 
@@ -390,37 +397,14 @@ for c in chr_list:
 
 
 
+
+
 #
 #======================================================================
 #BAM
 
 
 
-
-print "Open bam file",args.bam
-bamfile = pysam.Samfile(args.bam, "rb")
-
-
-#list for read categories
-multiMappedReads=set()
-fusionReads=[]
-
-#counts
-nrRNA=0
-nDeep=0
-nIntergenic=0
-nIntron=0
-nCDS=0
-nUTR3=0
-nUTR5=0
-nUTR_=0
-nJunction=0
-nMultiMapped=0
-nIntron=0
-nMT=0
-
-
-singleton=[]
 
 for chr in chr_list:
     
@@ -434,17 +418,16 @@ for chr in chr_list:
         flagMulti=0
         if read.mapq!=50:
             flagMulti=1
-            multiMappedReads.add(readName)
         
         
         
         if is_junction(read):
             feature=whichFeature(read,chr)
             if flagMulti==0:
+                    #1943766_h_0_GCGGATC_GATC,13,CDS,ENSMUSG00000021782,Dlg5,0
                     if args.perCategory:
                         outFile[chr].write( readName+','+chr + ',' + 'junction' + ',' + feature[1][0] + ',' + feature[1][1] + ',' + str(flagMulti)+'\n' )
-                    nJunction+=1
-            
+        
             elif args.multi:
                     if args.perCategory:
                         outFile[chr].write( readName+','+chr + ',' + 'junction' + ',' + feature[1][0] + ',' + feature[1][1] + ',' + str(flagMulti)+'\n' )
@@ -459,101 +442,11 @@ for chr in chr_list:
                     outFile[chr].write( readName+','+chr + ',' + feature[0] + ',' + feature[1][0] + ',' + feature[1][1] + ',' + str(flagMulti)+'\n' )
                 elif args.multi:
                     outFile[chr].write( readName+','+chr + ',' + feature[0] + ',' + feature[1][0] + ',' + feature[1][1] + ',' + str(flagMulti)+'\n' )
-        
-            if flagMulti==0: #read is not multi-mapped
-                if feature[0]=='CDS':
-                    nCDS+=1
-                    #print "CDS"
-                elif feature[0]=='INTRON':
-                    nIntron+=1
-                elif feature[0]=='UTR3':
-                    nUTR3+=1
-                elif feature[0]=='UTR5':
-                    nUTR5+=1
-                elif feature[0]=='UTR_':
-                     nUTR_+=1
-                elif feature[0]=='INTERGENIC':
-                    nIntergenic+=1
-                elif feature[0]=='DEEP':
-                    nDeep+=1
+
+    outFile[chr].close()
 
 
 
-
-for read in bamfile.fetch('MT'):
-    
-    readName=read.query_name
-
-    flagMulti=0
-    if read.mapq!=50:
-        flagMulti=1
-        multiMappedReads.add(readName)
-
-
-
-    if flagMulti==0:
-        if args.perCategory:
-            outFile['MT'].write( readName+','+'MT' + ',' + 'MT' + ",NA,NA" + ',' + str(flagMulti)+'\n' )
-        nMT+=1
-    elif args.multi:
-        if args.perCategory:
-            outFile['MT'].write( readName+','+'MT' + ',' + 'MT' + ",NA,NA"+','+str(flagMulti)+'\n' )
-
-
-
-
-
-nMultiMapped=len(multiMappedReads)
-
-nTotalMapped=nrRNA+nDeep+nIntergenic+nIntron+nCDS+nUTR3+nUTR5+nUTR_+nMultiMapped+nJunction+nMT
-
-
-header0=[]
-header=[]
-
-header0.append('## Number of reads per category reported here are based on uniquely mapped reads (i.e. reads mapped to a single position in the genome). Multi-mapped reads are reported under nMultiMapped category. To assign multi-mapped reads into genomic categories you need to run gprofilePlus.py. It will randomly assign multi-mapped reads into genomic categories considering expression level of the genes')
-
-header.append('sampleName')
-header.append('nTotalMapped')
-header.append('nJunction')
-header.append('nCDS')
-header.append('nUTR3')
-header.append('nUTR5')
-header.append('nUTR_')
-header.append('nIntron')
-header.append('nIntergenic')
-header.append('nDeep')
-header.append('nMT')
-header.append('nMultiMapped')
-
-
-gf=[]
-
-
-gf.append(prefix)
-gf.append(nTotalMapped)
-gf.append(nJunction)
-gf.append(nCDS)
-gf.append(nUTR3)
-gf.append(nUTR5)
-gf.append(nUTR_)
-gf.append(nIntron)
-gf.append(nIntergenic)
-gf.append(nDeep)
-gf.append(nMT)
-gf.append(nMultiMapped)
-
-
-
-c = csv.writer(open(args.out, "w"))
-c.writerow(header0)
-c.writerow(header)
-c.writerow(gf)
-
-
-
-
-print "Total number of multi-mapped reads",len(multiMappedReads)
 
 
 

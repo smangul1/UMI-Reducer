@@ -8,15 +8,31 @@ import argparse
 ap = argparse.ArgumentParser()
 ap.add_argument('input', help='<fastq.gz> file')
 ap.add_argument('outDir', help='Directory to be created to save <fastq> files. Each <fastq> file is obtained based on the barcode')
-#ap.add_argument('--testN', type=int,
-#                help='Run a test using only the first N features, and then '
-#                'print out some example feature IDs and their attributes')
-#ap.add_argument('--force', action='store_true',
-#                help='Overwrite an existing database')
-
-#cmd https://gist.github.com/daler/ec481811a44b3aa469f3
-
+optional_arguments = ap.add_argument_group("Optional Inputs")
+optional_arguments.add_argument("-min", "--minLength", help="The min length of the tag(read) extcated. Default value is 30 amino acids.", type=int)
+optional_arguments.add_argument("-max", "--maxLength", help="The max length of the tag(read) extcated. Default value is 50 amino acids.", type=int)
 args = ap.parse_args()
+
+
+
+
+
+if args.minLength:
+    minLength=int(args.minLength)
+else:
+    minLength=30
+
+
+if args.maxLength:
+    maxLength=int(args.maxLength)
+else:
+    maxLength=50
+
+
+if minLength>maxLength:
+    print "ERROR : minLength needs to be smaller than maxLength"
+    sys.exit(2)
+
 
 
 if not os.path.exists(args.outDir):
@@ -125,7 +141,7 @@ while True:
                 
                 
                 
-                if len(tag)>=30 and len(tag)<=50 and (ratio_20>=0.75 or ratio_30>=0.75):
+                if len(tag)>=minLength and len(tag)<=maxLength and (ratio_20>=0.75 or ratio_30>=0.75):
                     #17117312_h_0_GTTGCTC_AGCT
                     if seq[7:11] not in barcode:
                         file_barcode=dir_out+sample_name+"_"+seq[7:11]+".fastq"
@@ -166,7 +182,7 @@ while True:
                 ratio_30=float(k_quality_30)/20.0
                 
     
-                if len(tag)>=30 and len(tag)<=50 and ratio_30>=0.75:
+                if len(tag)>=minLength and len(tag)<=maxLength and ratio_30>=0.75:
                     #17117312_h_0_GTTGCTC_AGCT
                     if seq[7:11] not in barcode:
                         file_barcode=dir_out+sample_name+"_"+seq[7:11]+".fastq"
