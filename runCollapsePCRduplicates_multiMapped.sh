@@ -25,7 +25,7 @@ cd $line
 
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-echo "samtools=${DIR}/tools/samtools">run_${line}.sh
+echo "samtools=${DIR}/tools//samtools-1.3/samtools">run_${line}.sh
 
 echo ". /u/local/Modules/default/init/modules.sh">>run_${line}.sh
 echo "module load python/2.7.3">>run_${line}.sh
