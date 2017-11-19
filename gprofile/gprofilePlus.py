@@ -151,14 +151,14 @@ for chr in chr_list:
     
     #f_file with reads mapped to multiple genes, i.e. multiple lines per gene
     
-    print "dirOutPerCategory",dirOutPerCategory
-    print "prefix",prefix
-    print "chr",chr
+    #print "dirOutPerCategory",dirOutPerCategory
+    #print "prefix",prefix
+    #print "chr",chr
     
-    f_file=dirOutPerCategory+prefix+"."+chr+".genomicFeature"
+    f_file=dirOutPerCategory+"/"+prefix+"."+chr+".genomicFeature"
 
     #f_file2 with reads, where one location was choosen for read randomly
-    f_file2=dirOutPerCategory+prefix+"."+chr+".genomicFeature2"
+    f_file2=dirOutPerCategory+"/"+prefix+"."+chr+".genomicFeature2"
 
 
     out = open(f_file2, 'w')
@@ -186,7 +186,7 @@ for chr in chr_list:
 
 
 
-    print "Reading",f_file
+    #print "Reading",f_file
     with open(f_file,'r') as f:
         reader=csv.reader(f)
         
@@ -331,10 +331,10 @@ for chr in chr_list:
     
     
     
-    f_file=dirOutPerCategory+prefix+"."+chr+".genomicFeature2"
+    f_file=dirOutPerCategory+"/"+prefix+"."+chr+".genomicFeature2"
     f_fileOut=dirOutPerCategory+"/perGeneSummary/"+prefix+"."+chr+".perGeneSummary"
     
-    print "Processing ",f_file
+    #print "Processing ",f_file
 
 
 

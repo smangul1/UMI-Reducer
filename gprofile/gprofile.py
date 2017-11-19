@@ -82,15 +82,15 @@ def whichFeature(read,chr):
     
     
     if tag_cds>1 and tag_utr3+tag_utr5>1:
-        print "-------"
-        print "MIXED"
-        print tag_cds,tag_utr3,tag_utr5
-        print max_cds,tag_utr3,tag_utr5
-        print find_list_cds
-        print find_list_utr3
-        print find_list_utr5
-        print read
-        print "-------"
+        #print "-------"
+        #print "MIXED"
+        #print tag_cds,tag_utr3,tag_utr5
+        #print max_cds,tag_utr3,tag_utr5
+        #print find_list_cds
+        #print find_list_utr3
+        #print find_list_utr5
+        #print read
+        #print "-------"
         return 'MIXED'
     elif tag_utr3+tag_utr5>1:
         x=find_list_utr3[0][0]
@@ -155,7 +155,7 @@ def find(start, end, tree):
 ap = argparse.ArgumentParser()
 ap.add_argument('bam', help='sorted bam file with mapped reads')
 ap.add_argument('out', help='file to save the number of reads per genome category')
-ap.add_argument("--perCategory", help="reports the assigment for each read. A separate file per chromosome will be created",action="store_true")
+ap.add_argument("--perCategory", help="reports the assigment for each read. A separate file per chromosome will be created. In case --perCategory was choosen this will be directory to sabve results",action="store_true")
 ap.add_argument("--mouse", help="Use mouse genome annotations (NCBIM37). Default is human",action="store_true")
 ap.add_argument("--multi", help="Categories all copies of multi-mapped reads, they will have a special flag to futher assign according to transcript abundance ",action="store_true")
 args = ap.parse_args()
@@ -221,9 +221,8 @@ if args.perCategory:
     
     
     
-    dirOutPerCategory=outDir+"/"+prefix+"_perCategory/"
+    dirOutPerCategory=args.out+"/"
     if not os.path.exists(dirOutPerCategory):
-        print "Create ", dirOutPerCategory
         os.makedirs(dirOutPerCategory)
     
     print "Directory to save the results  ", dirOutPerCategory
@@ -408,7 +407,7 @@ for c in chr_list:
 
 for chr in chr_list:
     
-    print "Process chr",chr
+    #print "Process chr",chr
     for read in bamfile.fetch(chr):
         readName=read.query_name
         
