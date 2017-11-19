@@ -1,6 +1,6 @@
 
 
-if [ $# -lt 3 ]
+if [ $# -lt 1 ]
 then
 
 
