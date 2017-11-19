@@ -27,13 +27,14 @@ echo ". /u/local/Modules/default/init/modules.sh">run_${line}.sh
 echo "module load python/2.7.3">>run_${line}.sh
 
 echo "${dirSource}/run.hisat2.tuned.SE.mouse.sh ${dir}/${line}.fastq ${dir}/${line}/${line}/">>run_${line}.sh
-echo "${dirSource}/"
+echo "${dirSource}/umi-reducer.sh ${dir}/${line}..sort.bam">>run_${line}.sh
 
 
 
 
 done<$1
 
+exit 1
 
 cd $dir
 ls */*sh | awk '{i+=1;print "if [ $1 == "i" ];then ./"$1" ;fi"}' > myFunc.sh
