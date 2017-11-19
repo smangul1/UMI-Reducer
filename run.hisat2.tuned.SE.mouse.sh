@@ -39,7 +39,7 @@ if [ $# -lt 2 ]
 input1=$1
 #input2=$2
 outdir=$2
-
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 
 # STEP 0 - create output directory if it does not exist
@@ -74,12 +74,12 @@ res1=$(date +%s.%N)
 . /u/local/Modules/default/init/modules.sh
 #module load samtools
 
-$toolPath -x $index -U $input1 --end-to-end -N 1 -L 20 -i S,1,0.5 -D 25 -R 5 --pen-noncansplice 12 --mp 1,0 --sp 3,0 --time --reorder | samtools view -F 4 -bS - >$outdir/${toolName}_$(basename ${input1%.*}).bam 2>>$logfile
+$toolPath -x $index -U $input1 --end-to-end -N 1 -L 20 -i S,1,0.5 -D 25 -R 5 --pen-noncansplice 12 --mp 1,0 --sp 3,0 --time --reorder | ${DIR}/tools/samtools-1.3/samtools view -F 4 -bS - >$outdir/${toolName}_$(basename ${input1%.*}).bam 2>>$logfile
 
 
-tools/samtools-1.3/samtools sort $outdir/${toolName}_$(basename ${input1%.*}).bam >$outdir/${toolName}_$(basename ${input1%.*}).sort.bam
+${DIR}/tools/samtools-1.3/samtools sort $outdir/${toolName}_$(basename ${input1%.*}).bam >$outdir/${toolName}_$(basename ${input1%.*}).sort.bam
 rm -fr $outdir/${toolName}_$(basename ${input1%.*}).bam
-tools/samtools-1.3/samtools index $outdir/${toolName}_$(basename ${input1%.*}).sort.bam
+${DIR}/tools/samtools-1.3/samtools/tools/samtools-1.3/samtools index $outdir/${toolName}_$(basename ${input1%.*}).sort.bam
 
 #tools/samtools-1.3/samtools view -f 0x4 -bh $outdir/${toolName}_$(basename ${input1%.*}).bam | samtools bam2fq - >$outdir/${toolName}_$(basename ${input1%.*})_unmapped.fastq 2>>$logfile
 
