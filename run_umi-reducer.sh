@@ -33,7 +33,7 @@ echo "${dirSource}/umi-reducer.sh ${dir}/${line}..sort.bam">>run_${line}.sh
 
 cd ..
 
-done<$1
+done<samples.txt
 
 exit 1
 
