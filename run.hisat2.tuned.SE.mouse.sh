@@ -79,7 +79,7 @@ $toolPath -x $index -U $input1 --end-to-end -N 1 -L 20 -i S,1,0.5 -D 25 -R 5 --p
 
 ${DIR}/tools/samtools-1.3/samtools sort $outdir/${toolName}_$(basename ${input1%.*}).bam >$outdir/${toolName}_$(basename ${input1%.*}).sort.bam
 rm -fr $outdir/${toolName}_$(basename ${input1%.*}).bam
-${DIR}/tools/samtools-1.3/samtools/tools/samtools-1.3/samtools index $outdir/${toolName}_$(basename ${input1%.*}).sort.bam
+${DIR}/tools/samtools-1.3/samtools index $outdir/${toolName}_$(basename ${input1%.*}).sort.bam
 
 #tools/samtools-1.3/samtools view -f 0x4 -bh $outdir/${toolName}_$(basename ${input1%.*}).bam | samtools bam2fq - >$outdir/${toolName}_$(basename ${input1%.*})_unmapped.fastq 2>>$logfile
 

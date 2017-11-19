@@ -11,20 +11,22 @@ EOF
 extension="${BAM##*.}"
 filename="${BAM%.*}"
 
+dirSource="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
 echo "Start analysis"
 
 
 #collapsePCRduplicates.py
-python collapsePCRduplicates.py --m ${BAM} ${filename}_PCRduplicates_removed.bam
-tools/samtools-1.3/samtools sort ${filename}_PCRduplicates_removed.bam >${filename}_PCRduplicates_removed.sort.bam
+python ${dirSource}/collapsePCRduplicates.py --m ${BAM} ${filename}_PCRduplicates_removed.bam
+${dirSource}/tools/samtools-1.3/samtools sort ${filename}_PCRduplicates_removed.bam >${filename}_PCRduplicates_removed.sort.bam
 
 rm ${filename}_PCRduplicates_removed.bam
-tools/samtools-1.3/samtools index ${filename}_PCRduplicates_removed.sort.bam
+${dirSource}/tools/samtools-1.3/samtools index ${filename}_PCRduplicates_removed.sort.bam
 
 
 #gprofiler.py
-python gprofile.py --perCategory --mouse --multi ${filename}_PCRduplicates_removed.sort.bam ${filename}
-python gprofilePlus.py --mouse ${filename}
+python ${dirSource}/gprofile.py --perCategory --mouse --multi ${filename}_PCRduplicates_removed.sort.bam ${filename}
+python ${dirSource}/gprofilePlus.py --mouse ${filename}
 
 
 
