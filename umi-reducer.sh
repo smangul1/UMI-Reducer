@@ -23,8 +23,8 @@ tools/samtools-1.3/samtools index ${filename}_PCRduplicates_removed.sort.bam
 
 
 #gprofiler.py
-python gprofile.py --perCategory --mouse --multi ${filename}_PCRduplicates_removed.sort.bam ${filename}_PCRduplicates_removed_gprofiler
-python gprofilePlus.py --mouse ${filename}_PCRduplicates_removed_gprofiler
+python gprofile.py --perCategory --mouse --multi ${filename}_PCRduplicates_removed.sort.bam ${filename}
+python gprofilePlus.py --mouse ${filename}
 
 
 
