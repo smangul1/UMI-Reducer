@@ -9,7 +9,7 @@ AUTHOR="Serghei Mangul"
 ################################################################
 
 toolName="hisat2.tuned"
-toolPath="/u/home/h/harryyan/project-eeskin/utilities/hisat2-2.1.0/hisat2"
+toolPath="/u/home/s/svandrie/code/import/hisat2-2.1.0/hisat2"
 index="/u/home/s/serghei/project/umi-reducer_NCBIM37/genome"
 
 #index="/u/home/h/harryyan/project-eeskin/utilities/hisat2-2.1.0/ref_genome/grch38/genome"
