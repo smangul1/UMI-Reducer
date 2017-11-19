@@ -16,7 +16,7 @@ echo $dirSource
 dir=$1
 
 cd $dir
-ls * | awk -F ".fastq" '{print $1}' >samples.txt
+ls *fastq | awk -F ".fastq" '{print $1}' >samples.txt
 
 
 while read line
