@@ -1,2 +1,0 @@
-sample,Number of mapped reads,Number of reads mapped to unique location (UNIQUE reads),Number of reads after collapsing PCR dublicated (each read is present once) 
-SJV085_S1_L001_R1_001_GATC,1612275,1260207,678201
