@@ -169,7 +169,7 @@ args = ap.parse_args()
 
 ##About Interval trees  https://www.biostars.org/p/99/
 
-print "Open bam file",args.bam
+print ("Open bam file",args.bam)
 bamfile = pysam.Samfile(args.bam, "rb")
 
 
@@ -184,7 +184,7 @@ chr_list=[]
                 
                 
 if not args.mouse:
-    print "Human annotations are used ..."
+    print ("Human annotations are used ...")
     for i in range(1,23):
         chr_list.append(str(i))
     chr_list.append('X')
@@ -197,7 +197,7 @@ if not args.mouse:
     geneCoordinates_file=os.path.dirname(os.path.realpath(__file__))+'/annotations/human/bedPrepared/geneCoordinates_GRCh37.bed'
 
 elif args.mouse:
-    print "Mouse annotations are used ..."
+    print ("Mouse annotations are used ...")
     for i in range(1,20):
         chr_list.append(str(i))
     chr_list.append('X')
@@ -225,7 +225,7 @@ if args.perCategory:
     if not os.path.exists(dirOutPerCategory):
         os.makedirs(dirOutPerCategory)
     
-    print "Directory to save the results  ", dirOutPerCategory
+    print ("Directory to save the results  ", dirOutPerCategory)
     
     outFile={}
     for chr in chr_list:
@@ -273,13 +273,13 @@ for chr in chr_list:
 
 
 
-print "Load gene annotations ..."
+print ("Load gene annotations ...")
 
 
 geneUTR3={}
 
 #UTR3
-print "Load",utr3_file
+print ("Load",utr3_file)
 with open(utr3_file,'r') as f:
     
     reader=csv.reader(f)
@@ -305,7 +305,7 @@ with open(utr3_file,'r') as f:
 geneUTR5={}
 
 #UTR5
-print "Load",utr5_file
+print ("Load",utr5_file)
 with open(utr5_file,'r') as f:
     
     reader=csv.reader(f)
@@ -324,7 +324,7 @@ with open(utr5_file,'r') as f:
 geneCDS={}
 
 
-print "Load",cds_file
+print ("Load",cds_file)
 with open(cds_file,'r') as f:
     
     reader=csv.reader(f)
@@ -351,7 +351,7 @@ nGenes_rRNA=0
 #['1', 'non-rRNA', 'ENSG00000000457', 'SCYL3', '169818772', '169863408']
 
 
-print "Load",geneCoordinates_file
+print ("Load",geneCoordinates_file)
 
 geneNameSet={}
 
@@ -392,7 +392,7 @@ with open(geneCoordinates_file,'r') as f:
 
 
 for c in chr_list:
-    print "Number of genes in the annotations for chr %s = %i" %(c,len(geneNameSet[c]))
+    print ("Number of genes in the annotations for chr %s = %i" %(c,len(geneNameSet[c])))
 
 
 

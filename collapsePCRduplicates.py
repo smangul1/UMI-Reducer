@@ -45,7 +45,7 @@ chr_list.append('X')
 chr_list.append('Y')
 chr_list.append('MT')
 
-print chr
+print (chr)
 
 position=[]
 position_all_uniq=[]
@@ -86,7 +86,7 @@ outfile = pysam.AlignmentFile(out, "wb", header=bam_header)
 
 
 
-print "Open ",bam, "via pysam"
+print ("Open ",bam, "via pysam")
 
 
 
@@ -94,7 +94,7 @@ print "Open ",bam, "via pysam"
 for chr in chr_list:
     dict.clear()
     position[:]=[]
-    print "----------chr",chr
+    print ("----------chr",chr)
     for read in samfile.fetch(chr):
         mappedReads.append(read.query_name)
         
@@ -112,23 +112,22 @@ for chr in chr_list:
                 readLength.append(len(read.query_sequence))
 
 
-    print "numberReadsUnique",numberReadsUnique
-    print "numberReadsUniquePlusMultiMapped",numberReadsUniquePlusMultiMapped
+    print ("numberReadsUnique",numberReadsUnique)
+    print ("numberReadsUniquePlusMultiMapped",numberReadsUniquePlusMultiMapped)
 
 
 
     counter_chr=collections.Counter(position)
     position_all_uniq+=position
-    print "Number of position with #reads staring >=1", len(position)
+    print ("Number of position with #reads staring >=1", len(position))
 
     count=0
 
-    print  "Processing", len(counter_chr.items()), "items"
+    print  ("Processing", len(counter_chr.items()), "items")
 
     for key,val in counter_chr.items():
-        #print key,val
         if count%10000==1:
-            print count
+            print (count)
         count+=1
         
         if val==1:
@@ -149,7 +148,7 @@ for chr in chr_list:
             setReads.clear()
     
             if val>1000:
-                print val, chr,key
+                print (val, chr,key)
             Read=[]
             Read[:]=[]
             for read in samfile.fetch(chr,key,key+1):
@@ -157,7 +156,6 @@ for chr in chr_list:
                     Read.append(read)
                     setReads.add(read.query_name.split("_")[3]+"_"+read.query_sequence)
 
-        #print key,val
 
 
             
@@ -216,7 +214,7 @@ with open(stat_f, 'w') as fp:
 
 counter=collections.Counter(position_all_uniq)
 position_all_uniq=set(position_all_uniq)
-print "Number of position with #reads staring >=1", len(position_all_uniq)
+print ("Number of position with #reads staring >=1", len(position_all_uniq))
 
 
 
@@ -229,14 +227,13 @@ xbins1=[]
 
 counter_length_filtered=collections.Counter(readLength_filtered)
 for key,val in counter_length_filtered.items():
-    #print key,val
     xbins1.append(val)
     x1.append(key)
 
 
 
 plot1=out.split('.')[0]+'.readLengthPCRDuplicatesCollapsed.png'
-print "save to",plot1
+print ("save to",plot1)
 
 
 
@@ -253,12 +250,11 @@ xbins2=[]
 
 counter_length=collections.Counter(readLength)
 for key,val in counter_length.items():
-    #print key,val
     xbins2.append(val)
     x2.append(key)
 
 plot2=out.split('.')[0]+'.readLengthBeforePCRduplicates.png'
-print "save to",plot2
+print ("save to",plot2)
 
 
 
@@ -270,6 +266,6 @@ plt.savefig(plot2)
 samfile.close()
 
 
-print "DONE!"
+print ("DONE!")
 
 

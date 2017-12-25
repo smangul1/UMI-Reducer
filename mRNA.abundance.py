@@ -40,7 +40,7 @@ chr_list=[]
                 
                 
 if not args.mouse:
-    print "Human annotations are used ..."
+    print ("Human annotations are used ...")
     for i in range(1,23):
         chr_list.append(str(i))
     chr_list.append('X')
@@ -50,7 +50,7 @@ if not args.mouse:
     geneCoordinates_file=os.path.dirname(os.path.realpath(__file__))+'/annotations/human/bedPrepared/geneCoordinates_GRCh37.bed'
 
 elif args.mouse:
-    print "Mouse annotations are used ..."
+    print ("Mouse annotations are used ...")
     for i in range(1,20):
         chr_list.append(str(i))
     chr_list.append('X')
@@ -76,7 +76,7 @@ nGenes_rRNA=0
 #['1', 'non-rRNA', 'ENSG00000000457', 'SCYL3', '169818772', '169863408']
 
 
-print "Load",geneCoordinates_file
+print ("Load",geneCoordinates_file)
 
 geneNameSet={}
 geneIDSet={}
@@ -105,9 +105,9 @@ with open(geneCoordinates_file,'r') as f:
 
 
 for c in chr_list:
-    print "Number of genes in the annotations for chr %s = %i" %(c,len(geneNameSet[c]))
+    print ("Number of genes in the annotations for chr %s = %i" %(c,len(geneNameSet[c])))
 
-print "Look into ", args.dir
+print ("Look into ", args.dir)
 
 
 
@@ -168,7 +168,7 @@ for chr in chr_list:
     with open(f_file,'r') as f:
         reader=csv.reader(f)
         
-        reader.next()
+        next(reader,None)
         
         for line in reader:
             read=line[0]
@@ -189,8 +189,8 @@ for chr in chr_list:
     #print "Reading",f_file
     with open(f_file,'r') as f:
         reader=csv.reader(f)
-        
-        reader.next()
+
+        next(reader, None)
         
         for line in reader:
             
@@ -393,7 +393,7 @@ for chr in chr_list:
     outfile = open(f_fileOut, 'w' )
 
 
-    outfile.write("geneName,chr,nJunction,nCDS,nUTR3,nUTR5,nUTR_,nIntron\n")
+    outfile.write("ID,geneName,chr,nJunction,nCDS,nUTR3,nUTR5,nUTR_,nIntron\n")
 
     nJunction=0
     nCDS=0
@@ -407,11 +407,11 @@ for chr in chr_list:
 
 
     for g in geneNameSet[chr]:
+        geneId = dictGeneNames[g]
         if g in geneNameSetCurrent:
             value=dict[g]
             
-            geneId=dictGeneNames[g]
-            
+
             
             
             nJunction+=value[0]
@@ -423,9 +423,9 @@ for chr in chr_list:
             
             
             
-            outfile.write(g+","+chr+","+str(value[0])+","+str(value[1])+","+str(value[2])+","+str(value[3])+","+str(value[4])+","+str(value[5])+","+str(sum(value))+","+str(abundanceGene[geneId])+"\n")
+            outfile.write(geneId+","+g+","+chr+","+str(value[0])+","+str(value[1])+","+str(value[2])+","+str(value[3])+","+str(value[4])+","+str(value[5])+","+str(sum(value))+","+str(abundanceGene[geneId])+"\n")
         else:
-            outfile.write(g+","+chr+","+"0,0,0,0,0,0\n")
+            outfile.write(geneId+","+g+","+chr+","+"0,0,0,0,0,0\n")
 
     outfile.close()
 

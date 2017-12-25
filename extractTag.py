@@ -30,7 +30,7 @@ else:
 
 
 if minLength>maxLength:
-    print "ERROR : minLength needs to be smaller than maxLength"
+    print ("ERROR : minLength needs to be smaller than maxLength")
     sys.exit(2)
 
 
@@ -87,12 +87,12 @@ if not os.path.exists(statDir):
 
 statFile=statDir+"/nReadsStat.csv"
 
-print fastq_f
-print dir_out
+print (fastq_f)
+print (dir_out)
 
 sample_name=os.path.basename(fastq_f).split('.fastq')[0]
 
-print sample_name
+print (sample_name)
 
 
 
@@ -145,7 +145,7 @@ while True:
                     #17117312_h_0_GTTGCTC_AGCT
                     if seq[7:11] not in barcode:
                         file_barcode=dir_out+sample_name+"_"+seq[7:11]+".fastq"
-                        print "Create",file_barcode
+                        print ("Create",file_barcode)
                         barcode_dict[seq[7:11]] = open(file_barcode, 'w')
                         barcode.append(seq[7:11])
                         nReads[seq[7:11]]=[0,0,0]
@@ -186,7 +186,7 @@ while True:
                     #17117312_h_0_GTTGCTC_AGCT
                     if seq[7:11] not in barcode:
                         file_barcode=dir_out+sample_name+"_"+seq[7:11]+".fastq"
-                        print "Create",file_barcode
+                        print ("Create",file_barcode)
                         barcode_dict[seq[7:11]] = open(file_barcode, 'w')
                         barcode.append(seq[7:11])
                         nReads[seq[7:11]]=[0,0,0]
