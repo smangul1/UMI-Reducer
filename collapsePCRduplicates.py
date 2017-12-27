@@ -24,8 +24,14 @@ def editDistance(s1,s2):
 ap = argparse.ArgumentParser()
 ap.add_argument('inbam', help='Mapped reads in bam format')
 ap.add_argument('outbam', help='Output file to save reads after collapsing PCR duplicates')
-ap.add_argument('--m', action='store_true',help='Save multi-mapped reads')
+ap.add_argument("--MAPQ",help="mapping quality to extract uniquely-mapped reads. Only reads with this MAPQ will be selected. By default all reads will be considered", default=60,type=int)
+ap.add_argument("--u",help="a binary flag used to indicate that only uniquely mapped reads will be considered. By default uniquely mapped reads are defined as reads with MAPQ=60",action="store_true")
+ap.add_argument("--chr",help="Number of autosomes. By default 20", default=20,type=int)
+
 args = ap.parse_args()
+
+
+
 
 
 
@@ -38,7 +44,7 @@ out=args.outbam
 
 chr_list=[]
 
-for i in range(1,20):
+for i in range(1,args.chr):
     chr_list.append(str(i))
 
 chr_list.append('X')
@@ -97,19 +103,17 @@ for chr in chr_list:
     print ("----------chr",chr)
     for read in samfile.fetch(chr):
         mappedReads.append(read.query_name)
-        
-        
-        if args.m:
-            if read.mapq==50:
-                numberReadsUnique+=1
+
+        if args.u:
+            if read.mapq==args.MAPQ:
+                numberReadsUnique += 1
+                position.append(read.reference_start)
+                readLength.append(len(read.query_sequence))
+        else:
             numberReadsUniquePlusMultiMapped+=1
             position.append(read.reference_start)
             readLength.append(len(read.query_sequence))
-        else:
-            if read.mapq==50:
-                numberReadsUnique+=1
-                position.append(read.reference_start)
-                readLength.append(len(read.query_sequence))
+
 
 
     print ("numberReadsUnique",numberReadsUnique)
