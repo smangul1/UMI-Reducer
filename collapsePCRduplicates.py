@@ -171,8 +171,8 @@ for chr in chr_list:
                         setReads.add(read.query_name.split("_")[3]+"_"+read.query_sequence+"_"+str(read.reference_end))
 
 
-                    print (read.query_sequence,read.query_name,read.query_name.split("_")[3],read.reference_start,read.reference_end)
-            
+                    #print (read.query_sequence,read.query_name,read.query_name.split("_")[3],read.reference_start,read.reference_end)
+
             
 
             notsetReads=set()
