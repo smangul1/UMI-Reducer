@@ -134,7 +134,6 @@ for chr in chr_list:
     print  ("Processing", len(counter_chr.items()), "items")
 
     for key,val in counter_chr.items():
-        print (key,val)
         if count%10000==1:
             print (count)
         count+=1
