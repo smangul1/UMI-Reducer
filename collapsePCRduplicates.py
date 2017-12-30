@@ -28,7 +28,7 @@ ap.add_argument("--MAPQ",help="mapping quality to extract uniquely-mapped reads.
 ap.add_argument("--u",help="a binary flag used to indicate that only uniquely mapped reads will be considered. By default uniquely mapped reads are defined as reads with MAPQ=60",action="store_true")
 ap.add_argument("--chr",help="Number of autosomes. By default 20", default=20,type=int)
 ap.add_argument("--end",help="a binary flag used to indicate that end position is considered. This is beta version use with caution",action="store_true")
-
+ap.add_argument('--e', action='store_true',help='UMI-tools example format')
 
 
 
@@ -48,12 +48,21 @@ out=args.outbam
 
 chr_list=[]
 
-for i in range(1,args.chr):
-    chr_list.append(str(i))
+if args.e:
+    for i in range(1,20):
+        chr_list.append('chr'+str(i))
 
-chr_list.append('X')
-chr_list.append('Y')
-chr_list.append('MT')
+    chr_list.append('chrX')
+    chr_list.append('chrY')
+    chr_list.append('chrM')
+
+else:
+    for i in range(1,args.chr):
+        chr_list.append(str(i))
+
+    chr_list.append('X')
+    chr_list.append('Y')
+    chr_list.append('MT')
 
 print (chr)
 
@@ -104,7 +113,10 @@ print ("Open ",bam, "via pysam")
 for chr in chr_list:
     dict.clear()
     position[:]=[]
-    print ("----------chr",chr)
+    if args.e:
+        print "----------",chr
+    else:
+        print ("----------chr",chr)
     for read in samfile.fetch(chr):
         mappedReads.append(read.query_name)
 
@@ -116,7 +128,7 @@ for chr in chr_list:
         else:
             numberReadsUniquePlusMultiMapped+=1
             position.append(read.reference_start)
-            readLength.append(len(read.query_sequence))
+            readLength.append(len(str(read.query_sequence)))
 
 
 
@@ -144,7 +156,7 @@ for chr in chr_list:
                 if read.reference_start==key:
 
                     outfile.write(read)
-                    readLength_filtered.append(len(read.query_sequence))
+                    readLength_filtered.append(len(str(read.query_sequence)))
                     numberReadsUnique_filtered+=1
                     readSet.add(read.query_name)
      
@@ -165,9 +177,19 @@ for chr in chr_list:
                 if read.reference_start==key:
                     Read.append(read)
                     if args.end:
-                        setReads.add(read.query_name.split("_")[3] + "_" + read.query_sequence)
+                        #UMI-tools format
+                        if args.e:
+                            setReads.add(read.query_name.split("_")[1] + "_" + str(read.query_sequence))
+                        #default format
+                        else:
+                            setReads.add(read.query_name.split("_")[3] + "_" + read.query_sequence)
                     else:
-                        setReads.add(read.query_name.split("_")[3]+"_"+read.query_sequence+"_"+str(read.reference_end))
+                        #UMI-tools format
+                        if args.e:
+                            setReads.add(read.query_name.split("_")[1]+"_"+str(read.query_sequence))
+                        #default format
+                        else:
+                            setReads.add(read.query_name.split("_")[3]+"_"+read.query_sequence+"_"+str(read.reference_end))
 
 
                     #print (read.query_sequence,read.query_name,read.query_name.split("_")[3],read.reference_start,read.reference_end)
@@ -179,20 +201,40 @@ for chr in chr_list:
             numberReadsUnique_covGreated1+=len(setReads)
             for i in range(0,val):
                 if args.end:
-                    extended_read_name = Read[i].query_name.split("_")[3] + "_" + Read[i].query_sequence+"_"+str(Read[i].reference_end)
+                    #UMI-tools format
+                    if args.e:
+                        extended_read_name = Read[i].query_name.split("_")[1] + "_" + str(Read[i].query_sequence)+"_"+str(Read[i].reference_end)
+                    #default format
+                    else:
+                        extended_read_name = Read[i].query_name.split("_")[3] + "_" + Read[i].query_sequence+"_"+str(Read[i].reference_end)
                 else:
-                    extended_read_name=Read[i].query_name.split("_")[3]+"_"+Read[i].query_sequence
+                    #UMI-tools format
+                    if args.e:
+                        extended_read_name=Read[i].query_name.split("_")[1]+"_"+Read[i].query_sequence
+                    #default format
+                    else:
+                        extended_read_name=Read[i].query_name.split("_")[3]+"_"+Read[i].query_sequence
 
                 if extended_read_name in setReads and extended_read_name not in notsetReads:
                         outfile.write(Read[i])
                         numberReadsUnique_filtered+=1
-                        readLength_filtered.append(len(Read[i].query_sequence))
+                        readLength_filtered.append(len(str(Read[i].query_sequence)))
 
 
                         if args.end:
-                            notsetReads.add(Read[i].query_name.split("_")[3] + "_" + Read[i].query_sequence+"_"+str(Read[i].reference_end))
+                            #UMI-tools format
+                            if args.e:
+                                notsetReads.add(Read[i].query_name.split("_")[1] + "_" + Read[i].query_sequence+"_"+str(Read[i].reference_end))
+                            #default format
+                            else:
+                                notsetReads.add(Read[i].query_name.split("_")[3] + "_" + Read[i].query_sequence+"_"+str(Read[i].reference_end))
                         else:
-                            notsetReads.add(Read[i].query_name.split("_")[3]+"_"+Read[i].query_sequence)
+                            #UMI-tools format
+                            if args.e:
+                                notsetReads.add(Read[i].query_name.split("_")[1]+"_"+Read[i].query_sequence)
+                            #default format
+                            else:
+                                notsetReads.add(Read[i].query_name.split("_")[3]+"_"+Read[i].query_sequence)
 
                         readSet.add(Read[i].query_name)
 
