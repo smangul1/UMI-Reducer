@@ -104,7 +104,7 @@ outfile = pysam.AlignmentFile(out, "wb", header=bam_header)
 
 
 
-print ("Open ",bam, "via pysam")
+print ("Open ",bam, "using pysam")
 
 
 
@@ -122,10 +122,9 @@ for chr in chr_list:
     for read in samfile.fetch(chr):
         mappedReads.append(read.query_name)
 
-    if read.get_tag("NH") == 1:
-        print read.get_tag("NH"), read
-        numberReadsUnique += 1
-        numberReadsUniqueGlobal+=1
+        if read.get_tag("NH") == 1:
+            numberReadsUnique += 1
+            numberReadsUniqueGlobal+=1
 
         if args.u:
             if read.get_tag("NH")==1:

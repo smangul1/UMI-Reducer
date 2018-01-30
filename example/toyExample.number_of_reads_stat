@@ -1,2 +1,0 @@
-sample,Number of mapped reads,Number of reads mapped to unique location (UNIQUE reads),Number of reads after collapsing PCR dublicated (each read is present once) 
-example/toyExample,374,255,255
