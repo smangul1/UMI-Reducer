@@ -21,10 +21,10 @@ echo "Start analysis"
 
 #collapsePCRduplicates.py
 python ${dirSource}/collapsePCRduplicates.py  ${BAM} ${filename}_PCRduplicates_removed.bam
-#${dirSource}/tools/samtools-1.3/samtools sort ${filename}_PCRduplicates_removed.bam >${filename}_PCRduplicates_removed.sort.bam
+${dirSource}/tools/samtools-1.3/samtools sort ${filename}_PCRduplicates_removed.bam >${filename}_PCRduplicates_removed.sort.bam
 
 rm ${filename}_PCRduplicates_removed.bam
-#${dirSource}/tools/samtools-1.3/samtools index ${filename}_PCRduplicates_removed.sort.bam
+${dirSource}/tools/samtools-1.3/samtools index ${filename}_PCRduplicates_removed.sort.bam
 
 echo "Run genomic.categories.py ..."
 
