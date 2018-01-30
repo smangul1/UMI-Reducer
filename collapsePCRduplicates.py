@@ -27,7 +27,6 @@ ap.add_argument('outbam', help='Output file to save reads after collapsing PCR d
 ap.add_argument("--MAPQ",help="mapping quality to extract uniquely-mapped reads. Only reads with this MAPQ will be selected. By default all reads will be considered", default=60,type=int)
 ap.add_argument("--u",help="a binary flag used to indicate that only uniquely mapped reads will be considered. By default uniquely mapped reads are defined as reads with MAPQ=60",action="store_true")
 ap.add_argument("--chr",help="Number of autosomes. By default 20", default=20,type=int)
-ap.add_argument("--end",help="a binary flag used to indicate that end position is considered. This is beta version use with caution",action="store_true")
 ap.add_argument('--e', action='store_true',help='UMI-tools example format')
 
 
@@ -109,8 +108,11 @@ print ("Open ",bam, "via pysam")
 
 
 
+numberReadsUniqueGlobal=0 # across all chromosomes
 
 for chr in chr_list:
+
+    numberReadsUnique=0
     dict.clear()
     position[:]=[]
     if args.e:
@@ -120,9 +122,13 @@ for chr in chr_list:
     for read in samfile.fetch(chr):
         mappedReads.append(read.query_name)
 
+    if read.get_tag("NH") == 1:
+        print read.get_tag("NH"), read
+        numberReadsUnique += 1
+        numberReadsUniqueGlobal+=1
+
         if args.u:
-            if read.mapq==args.MAPQ:
-                numberReadsUnique += 1
+            if read.get_tag("NH")==1:
                 position.append(read.reference_start)
                 readLength.append(len(read.query_sequence))
         else:
@@ -176,23 +182,15 @@ for chr in chr_list:
             for read in samfile.fetch(chr,key,key+1):
                 if read.reference_start==key:
                     Read.append(read)
-                    if args.end:
-                        #UMI-tools format
-                        if args.e:
-                            setReads.add(read.query_name.split("_")[1] + "_" + str(read.query_sequence))
-                        #default format
-                        else:
-                            setReads.add(read.query_name.split("_")[3] + "_" + read.query_sequence)
+
+                    #UMI-tools format
+                    if args.e:
+                        setReads.add(read.query_name.split("_")[1]+"_"+str(read.cigarstring))
+                    #default format
                     else:
-                        #UMI-tools format
-                        if args.e:
-                            setReads.add(read.query_name.split("_")[1]+"_"+str(read.query_sequence))
-                        #default format
-                        else:
-                            setReads.add(read.query_name.split("_")[3]+"_"+read.query_sequence+"_"+str(read.reference_end))
+                        setReads.add(read.query_name.split("_")[3]+"_"+read.cigarstring+"_"+str(read.reference_end))
 
 
-                    #print (read.query_sequence,read.query_name,read.query_name.split("_")[3],read.reference_start,read.reference_end)
 
             
 
@@ -200,20 +198,16 @@ for chr in chr_list:
             notsetReads.clear()
             numberReadsUnique_covGreated1+=len(setReads)
             for i in range(0,val):
-                if args.end:
-                    #UMI-tools format
-                    if args.e:
-                        extended_read_name = Read[i].query_name.split("_")[1] + "_" + str(Read[i].query_sequence)+"_"+str(Read[i].reference_end)
+
+                #UMI-tools format
+                if args.e:
+                    extended_read_name=Read[i].query_name.split("_")[1]+"_"+Read[i].cigarstring
                     #default format
-                    else:
-                        extended_read_name = Read[i].query_name.split("_")[3] + "_" + Read[i].query_sequence+"_"+str(Read[i].reference_end)
                 else:
-                    #UMI-tools format
-                    if args.e:
-                        extended_read_name=Read[i].query_name.split("_")[1]+"_"+Read[i].query_sequence
-                    #default format
-                    else:
-                        extended_read_name=Read[i].query_name.split("_")[3]+"_"+Read[i].query_sequence
+                    extended_read_name=Read[i].query_name.split("_")[3]+"_"+Read[i].cigarstring
+
+
+
 
                 if extended_read_name in setReads and extended_read_name not in notsetReads:
                         outfile.write(Read[i])
@@ -221,20 +215,15 @@ for chr in chr_list:
                         readLength_filtered.append(len(str(Read[i].query_sequence)))
 
 
-                        if args.end:
-                            #UMI-tools format
-                            if args.e:
-                                notsetReads.add(Read[i].query_name.split("_")[1] + "_" + Read[i].query_sequence+"_"+str(Read[i].reference_end))
-                            #default format
-                            else:
-                                notsetReads.add(Read[i].query_name.split("_")[3] + "_" + Read[i].query_sequence+"_"+str(Read[i].reference_end))
+
+                        #UMI-tools format
+                        if args.e:
+                            notsetReads.add(Read[i].query_name.split("_")[1]+"_"+Read[i].cigarstring)
+                        #default format
                         else:
-                            #UMI-tools format
-                            if args.e:
-                                notsetReads.add(Read[i].query_name.split("_")[1]+"_"+Read[i].query_sequence)
-                            #default format
-                            else:
-                                notsetReads.add(Read[i].query_name.split("_")[3]+"_"+Read[i].query_sequence)
+                            notsetReads.add(Read[i].query_name.split("_")[3]+"_"+Read[i].cigarstring)
+
+
 
                         readSet.add(Read[i].query_name)
 
@@ -262,7 +251,7 @@ nr=[]
 
 nr.append(out.split('.')[0])
 nr.append(len(set(mappedReads)))
-nr.append(numberReadsUnique)
+nr.append(numberReadsUniqueGlobal)
 nr.append(len(readSet))
 
 
