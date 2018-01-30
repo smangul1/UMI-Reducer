@@ -3,11 +3,25 @@ import sys
 import csv
 import os
 import argparse
-
-
-
+from numpy.random import choice
+import random
 from quicksect import IntervalNode
 from random import randint, seed
+
+def normalize(a):
+    b = a
+    s = sum(a)
+
+    if s == 0:
+        for i in a:
+            i = 1 / len(a)
+    else:
+        for i in a:
+            i = i / (s + 0.0001)
+    return a
+
+
+
 
 
 def getOverlap(a, b):
@@ -215,6 +229,10 @@ dirOutPerCategory=""
 
 base=os.path.basename(args.bam)
 prefix=os.path.splitext(base)[0]
+
+
+
+
 
 #-------perCategory-------
 if args.perCategory:
@@ -448,8 +466,258 @@ for chr in chr_list:
 
 outFile.close()
 
-print "Results are saved to ",f_file
-print "Done!"
+print ("Results are saved to ",f_file)
+print ("Done!")
+
+
+
+#-===============
+# SECOND PART
+
+
+geneNameSet = {}
+geneIDSet = set()
+
+for c in chr_list:
+    geneNameSet[c] = set()
+
+# 1,non-rRNA,ENSMUSG00000000544,Gpa33,168060369,168096
+
+dictGeneIds = {}
+dict_id2name = {}
+dict_id2chr = {}
+
+with open(geneCoordinates_file, 'r') as f:
+    reader = csv.reader(f)
+    for line in reader:
+        chr = line[0]
+        if chr in chr_list:
+            x = int(line[4])
+            y = int(line[5])
+            geneID = line[2]
+            geneName = line[3]
+            geneIDSet.add(geneID)
+            dict_id2name[geneID] = geneName
+            dict_id2chr[geneID] = chr
+
+print("Number of genes in the annotations = %i" % (len(geneIDSet)))
+
+
+
+abundanceGene = {}
+mReadsSet = set()
+readDict = {}
+
+# 5463462_h_0_TTAAACT_TAGC,1,CDS,ENSMUSG00000051951,Xkr4,0
+
+
+# updated 01/14/2017
+# .genomicFeature files are parsed and we ramdonly select were multi-mapped reads is mapped
+# We select ramdomly:
+# 1. read is mapped to multiple location of the same gene
+# 2. read is mapped otside of the gene . Or mapped into a gene and outsde of the gene
+# We use relative frequency of the gene (calculated based on uniqelly mapped reads)
+# 1. read is mapped to multiple location, all those locations are within different genes
+
+
+
+
+
+
+for g in geneIDSet:
+    abundanceGene[g] = 0
+
+# f_file with reads mapped to multiple genes, i.e. multiple lines per gene
+
+
+
+
+
+# f_file2 with reads, where one location was choosen for read randomly
+f_file2 = dirOutPerCategory + prefix + ".genomicFeature2"
+
+out = open(f_file2, 'w')
+out.write("readName,chr,category,geneID,geneName,flag_multiMapped")
+out.write("\n")
+
+with open(f_file, 'r') as f:
+    reader = csv.reader(f)
+    next(reader, None)
+
+    for line in reader:
+        read = line[0]
+        geneID = line[3]
+        flagM = int(line[5])
+        readName = line[0]
+        mReadsSet.add(readName)
+
+for r in mReadsSet:
+    readDict[r] = []
+
+reads_unique_not_used_counts = 0
+# print "Reading",f_file
+with open(f_file, 'r') as f:
+    reader = csv.reader(f)
+    next(reader, None)
+    for line in reader:
+        category = line[2]
+        geneID = line[3]
+        flagM = int(line[5])
+        readName = line[0]
+        readDict[readName].append(line)
+        # abundanceGene - we need this to calculate
+        if geneID != "NA" and flagM == 0 and category != "INTRON":
+            abundanceGene[geneID] += 1
+        elif flagM == 0:
+            reads_unique_not_used_counts += 1
+
+print("sum(abundanceGene.values()),reads_unique_not_used_counts", sum(abundanceGene.values()),
+      reads_unique_not_used_counts)
+
+for r in mReadsSet:
+
+    # read mapped to multiple locations of the same gene
+
+    weights = []
+    weights[:] = []
+
+    if len(readDict[
+               r]) == 1:  # some reads were multi-mapped, but than got collapsed and now have flag 1 but are present in a single copy in [genomicFeature] file
+        out.write(
+            readDict[r][0][0] + "," + readDict[r][0][1] + "," + readDict[r][0][2] + "," + readDict[r][0][3] + "," +
+            readDict[r][0][4] + "," + readDict[r][0][5])
+        out.write("\n")
+
+    if len(readDict[r]) > 1:  # read is multi-mapped
+
+        # print "==============="
+        # print readDict[r], "MULTI-MAPPED"
+
+        genes = set()
+        genes.clear()
+        for g in readDict[r]:
+            genes.add(g[3])
+
+        irand = 0
+
+        if len(
+                genes) == 1 or "NA" in genes:  # read mapped to different location within the same gene OR genes vs intergenic
+
+            # print "-->(1) Is mapped to different location within the same gene"
+
+            irand = random.randrange(0, len(readDict[r]))
+
+
+
+
+        else:
+
+            listIndex = list(range(len(readDict[r])))
+
+            # print "-->(2)Is mapped to different genes"
+
+            for g in readDict[r]:
+                weights.append(abundanceGene[g[3]])
+
+            if sum(
+                    weights) == 0.0:  # in case read belongs to genrs with no uniq reads. As the results the freq of those genes is 0. And we can not do assigment based on freq of genes
+                # print "Sum is 0!"
+
+                norm = [float(1.0 / len(weights))] * len(weights)
+            else:
+                norm = [float(i) / sum(weights) for i in weights]
+
+            weights = norm
+
+            irand = choice(listIndex, p=weights)
+
+        # print "We choose",irand,readDict[r][irand]
+
+        out.write(readDict[r][irand][0] + "," + readDict[r][irand][1] + "," + readDict[r][irand][2] + "," +
+                  readDict[r][irand][3] + "," + readDict[r][irand][4] + "," + readDict[r][irand][5])
+        out.write("\n")
+
+        # make sure to clean everething, as we fo to new chromosome
+
+out.close()
+
+f_summary = dirOutPerCategory + prefix + "_summary_per_feature.csv"
+fileS = open(f_summary, "w")
+fileS.write("nJunction,nCDS,nUTR3,nUTR5,nUTR_,nIntron")
+fileS.write("\n")
+
+geneIDSetCurrent = set()
+dict = {}
+for g in geneIDSet:
+    dict[g] = [0, 0, 0, 0, 0, 0]
+
+
+
+InterGenic_set=set()
+
+f_fileOut = dirOutPerCategory + prefix + ".perGeneSummary"
+with open(f_file2, 'r') as f:
+    reader = csv.reader(f)
+    for line in reader:
+
+        if len(line) == 6:  # fix it later
+            read = line[0]
+            geneID = line[3]
+
+            geneIDSetCurrent.add(geneID)
+            category = line[2]
+
+            if category == "junction" and geneID != "NA":
+                dict[geneID][0] += 1
+            elif (category == "CDS"):
+                dict[geneID][1] += 1
+            elif (category == "UTR3"):
+                dict[geneID][2] += 1
+            elif (category == "UTR5"):
+                dict[geneID][3] += 1
+            elif category == "UTR_":
+                dict[geneID][4] += 1
+            elif category == "INTRON":
+                dict[geneID][5] += 1
+
+        else:
+            print("Warning:", line)
+
+outfile = open(f_fileOut, 'w')
+outfile.write("ID,geneName,chr,nJunction,nCDS,nUTR3,nUTR5,nUTR_,nIntron,gene.count,gene.count.unique \n")
+
+nJunction = 0
+nCDS = 0
+nUTR3 = 0
+nUTR5 = 0
+nUTR_ = 0
+nIntron = 0
+
+for g in geneIDSet:
+    if g in geneIDSetCurrent:
+        nJunction += dict[g][0]
+        nCDS += dict[g][1]
+        nUTR3 += dict[g][2]
+        nUTR5 += dict[g][3]
+        nUTR_ += dict[g][4]
+        nIntron += dict[g][5]
+        outfile.write(g + "," + dict_id2name[g] + "," + dict_id2chr[g] + "," + str(dict[g][0]) + "," + str(
+            dict[g][1]) + "," + str(dict[g][2]) + "," + str(dict[g][3]) + "," + str(dict[g][4]) + "," + str(
+            dict[g][5]) + "," + str(sum(dict[g])) + "," + str(abundanceGene[g]) + "\n")
+    else:
+        outfile.write(g + "," + dict_id2name[g] + "," + dict_id2chr[g] + "," + "0,0,0,0,0,0\n")
+
+outfile.close()
+
+fileS.write(str(nJunction) + "," + str(nCDS) + "," + str(nUTR3) + "," + str(nUTR5) + "," + str(nUTR_) + "," + str(
+    nIntron))
+fileS.write("\n")
+fileS.close()
+
+print("Summary per category is here", f_summary)
+print("Summary per gene is here", f_fileOut)
+print("Done!")
+
 
 
 

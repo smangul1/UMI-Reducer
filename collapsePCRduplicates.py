@@ -115,10 +115,7 @@ for chr in chr_list:
     numberReadsUnique=0
     dict.clear()
     position[:]=[]
-    if args.e:
-        print "----------",chr
-    else:
-        print ("----------chr",chr)
+
     for read in samfile.fetch(chr):
         mappedReads.append(read.query_name)
 

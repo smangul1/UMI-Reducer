@@ -1,2 +1,2 @@
 sample,Number of mapped reads,Number of reads mapped to unique location (UNIQUE reads),Number of reads after collapsing PCR dublicated (each read is present once) 
-/Users/serghei/code/UMI-Reducer/example/toy,374,255,299
+example/toy,374,255,299

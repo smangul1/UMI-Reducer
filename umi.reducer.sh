@@ -10,6 +10,9 @@ EOF
 #filename=$(basename "$BAM")
 extension="${BAM##*.}"
 filename="${BAM%.*}"
+prefix=${filename##*/}
+
+
 
 dirSource="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
@@ -28,12 +31,10 @@ echo "Run genomic.categories.py ..."
 python ${dirSource}/genomic.categories.py --perCategory --mouse --multi ${filename}_PCRduplicates_removed.sort.bam ${filename}
 
 
-python ${dirSource}/mRNA.abundance.py --mouse ${filename}/*genomicFeature
 
 
 
 
-echo ${filename}
 
 
 
