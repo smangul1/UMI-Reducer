@@ -429,7 +429,7 @@ for chr in chr_list:
 
     #print "Process chr",chr
     for read in bamfile.fetch(chr):
-        readName=read.query_name
+        readName=read.qname
 
 
 

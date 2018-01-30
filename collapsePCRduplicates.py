@@ -117,7 +117,7 @@ for chr in chr_list:
     position[:]=[]
 
     for read in samfile.fetch(chr):
-        mappedReads.append(read.query_name)
+        mappedReads.append(read.qname)
 
         if read.get_tag("NH") == 1:
             numberReadsUnique += 1
