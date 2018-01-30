@@ -72,7 +72,7 @@ position_all_uniq=[]
 
 
 
-samfile = pysam.AlignmentFile(bam, "rb" )
+samfile = pysam.Samfile(bam, "rb" )
 
 
 dict= {}
