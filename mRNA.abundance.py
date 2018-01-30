@@ -123,7 +123,7 @@ base=os.path.basename(args.file)
 prefix=os.path.splitext(base)[0].split('.genomicFeature')[0] # not sure why we need replace. But somehow split works wired 09/01/2017
 
 
-
+dir=os.path.dirname(args.file)
 
 
 
@@ -272,9 +272,9 @@ for r in mReadsSet:
 
 out.close()
 
-f_summary=prefix+"_summary_per_feature.csv"
+f_summary=dir+"/"+prefix+"_summary_per_feature.csv"
 fileS=open(f_summary,"w")
-fileS.write("chr,nJunction,nCDS,nUTR3,nUTR5,nUTR_,nIntron")
+fileS.write("nJunction,nCDS,nUTR3,nUTR5,nUTR_,nIntron,nInterGenic")
 fileS.write("\n")
 
 
@@ -286,7 +286,11 @@ for g in geneIDSet:
 if not os.path.exists("perGeneSummary"):
     os.makedirs("perGeneSummary/")
 
-f_fileOut="perGeneSummary/"+prefix+".perGeneSummary"
+
+
+nInterGenic=0
+
+f_fileOut=dir+"/perGeneSummary/"+prefix+".perGeneSummary"
 with open(f_file2, 'r') as f:
     reader = csv.reader(f)
     for line in reader:
@@ -310,6 +314,8 @@ with open(f_file2, 'r') as f:
                 dict[geneID][4] += 1
             elif category == "INTRON":
                 dict[geneID][5] += 1
+            else:
+                nInterGenic+=1
         else:
             print "Warning:",line
 
@@ -338,7 +344,7 @@ for g in geneIDSet:
 
 outfile.close()
 
-fileS.write("Total,"+str(nJunction)+","+str(nCDS)+","+str(nUTR3)+","+str(nUTR5)+","+str(nUTR_)+","+str(nIntron))
+fileS.write(str(nJunction)+","+str(nCDS)+","+str(nUTR3)+","+str(nUTR5)+","+str(nUTR_)+","+str(nIntron)+nInterGenic)
 fileS.write("\n")
 fileS.close()
 

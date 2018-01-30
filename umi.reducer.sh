@@ -26,7 +26,12 @@ rm ${filename}_PCRduplicates_removed.bam
 echo "Run genomic.categories.py ..."
 
 python ${dirSource}/genomic.categories.py --perCategory --mouse --multi ${filename}_PCRduplicates_removed.sort.bam ${filename}
-python ${dirSource}/mRNA.abundance.py --mouse ${filename}
+
+
+python ${dirSource}/mRNA.abundance.py --mouse ${filename}/*genomicFeature
+
+
+
 
 echo ${filename}
 

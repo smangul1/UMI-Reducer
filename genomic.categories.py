@@ -227,12 +227,10 @@ if args.perCategory:
     
     print ("Directory to save the results  ", dirOutPerCategory)
     
-    outFile={}
-    for chr in chr_list:
-        f_file=dirOutPerCategory+prefix+"."+chr+".genomicFeature"
-        outfile = open(f_file, 'w' )
-        outFile[chr]=open(f_file, 'w' )
-        outFile[chr].write('readName,chr,category, geneID, geneName, flag_multiMapped\n')
+    f_file=dirOutPerCategory+prefix+".genomicFeature"
+    outFile = open(f_file, 'w' )
+    outFile.write('readName,chr,category, geneID, geneName, flag_multiMapped')
+    outFile.write('\n')
 
 
 
@@ -410,18 +408,15 @@ for c in chr_list:
 
 for chr in chr_list:
 
-    print chr, outFile[chr]
-    
+
     #print "Process chr",chr
     for read in bamfile.fetch(chr):
         readName=read.query_name
 
 
-        if readName=="777_h_0_CACCTGT_TAGC":
-            print "777_h_0_CACCTGT_TAGC", chr
+
         
-        print "----",readName
-        
+
         
         flagMulti=0
         if read.get_tag("NH") != 1:
@@ -434,11 +429,11 @@ for chr in chr_list:
             if flagMulti==0:
                     #1943766_h_0_GCGGATC_GATC,13,CDS,ENSMUSG00000021782,Dlg5,0
                     if args.perCategory:
-                        outFile[chr].write( readName+','+chr + ',' + 'junction' + ',' + feature[1][0] + ',' + feature[1][1] + ',' + str(flagMulti)+'\n' )
+                        outFile.write( readName+','+chr + ',' + 'junction' + ',' + feature[1][0] + ',' + feature[1][1] + ',' + str(flagMulti)+'\n' )
         
             elif args.multi:
                     if args.perCategory:
-                        outFile[chr].write( readName+','+chr + ',' + 'junction' + ',' + feature[1][0] + ',' + feature[1][1] + ',' + str(flagMulti)+'\n' )
+                        outFile.write( readName+','+chr + ',' + 'junction' + ',' + feature[1][0] + ',' + feature[1][1] + ',' + str(flagMulti)+'\n' )
 
                 
     
@@ -447,16 +442,14 @@ for chr in chr_list:
             
             if args.perCategory:
                 if flagMulti==0:
-                    outFile[chr].write( readName+','+chr + ',' + feature[0] + ',' + feature[1][0] + ',' + feature[1][1] + ',' + str(flagMulti)+'\n' )
+                    outFile.write( readName+','+chr + ',' + feature[0] + ',' + feature[1][0] + ',' + feature[1][1] + ',' + str(flagMulti)+'\n' )
                 elif args.multi:
-                    outFile[chr].write( readName+','+chr + ',' + feature[0] + ',' + feature[1][0] + ',' + feature[1][1] + ',' + str(flagMulti)+'\n' )
+                    outFile.write( readName+','+chr + ',' + feature[0] + ',' + feature[1][0] + ',' + feature[1][1] + ',' + str(flagMulti)+'\n' )
 
-    outFile[chr].close()
+outFile.close()
 
-
-
-
-
+print "Results are saved to ",f_file
+print "Done!"
 
 
 
