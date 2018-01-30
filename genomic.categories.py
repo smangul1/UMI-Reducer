@@ -184,7 +184,7 @@ args = ap.parse_args()
 ##About Interval trees  https://www.biostars.org/p/99/
 
 print ("Open bam file",args.bam)
-bamfile = pysam.AlignmentFile(args.bam, "rb")
+bamfile = pysam.Samfile(args.bam, "rb")
 
 
 
