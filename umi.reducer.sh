@@ -23,6 +23,7 @@ ${dirSource}/tools/samtools-1.3/samtools sort ${filename}_PCRduplicates_removed.
 rm ${filename}_PCRduplicates_removed.bam
 ${dirSource}/tools/samtools-1.3/samtools index ${filename}_PCRduplicates_removed.sort.bam
 
+echo "Run genomic.categories.py ..."
 
 python ${dirSource}/genomic.categories.py --perCategory --mouse --multi ${filename}_PCRduplicates_removed.sort.bam ${filename}
 python ${dirSource}/mRNA.abundance.py --mouse ${filename}

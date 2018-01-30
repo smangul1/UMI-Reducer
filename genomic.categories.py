@@ -411,11 +411,11 @@ for chr in chr_list:
     for read in bamfile.fetch(chr):
         readName=read.query_name
         
-        
+        print readName
         
         
         flagMulti=0
-        if read.mapq!=50:
+        if read.get_tag("NH") == 1:
             flagMulti=1
         
         
