@@ -100,7 +100,7 @@ bam_header = pysam.Samfile(bam, 'rb').header
 
 
 
-outfile = pysam.AlignmentFile(out, "wb", header=bam_header)
+outfile = pysam.Samfile(out, "wb", header=bam_header)
 
 
 
