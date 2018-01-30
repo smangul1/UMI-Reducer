@@ -170,7 +170,7 @@ args = ap.parse_args()
 ##About Interval trees  https://www.biostars.org/p/99/
 
 print ("Open bam file",args.bam)
-bamfile = pysam.Samfile(args.bam, "rb")
+bamfile = pysam.AlignmentFile(args.bam, "rb")
 
 
 
@@ -406,12 +406,14 @@ for c in chr_list:
 
 
 for chr in chr_list:
+
+    print chr
     
     #print "Process chr",chr
     for read in bamfile.fetch(chr):
         readName=read.query_name
         
-        print readName
+        print "----",readName
         
         
         flagMulti=0
