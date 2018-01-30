@@ -405,19 +405,26 @@ for c in chr_list:
 
 
 
+# the same read can be assigned to multiple genes from different chr
+
+
 for chr in chr_list:
 
-    print chr
+    print chr, outFile[chr]
     
     #print "Process chr",chr
     for read in bamfile.fetch(chr):
         readName=read.query_name
+
+
+        if readName=="777_h_0_CACCTGT_TAGC":
+            print "777_h_0_CACCTGT_TAGC", chr
         
         print "----",readName
         
         
         flagMulti=0
-        if read.get_tag("NH") == 1:
+        if read.get_tag("NH") != 1:
             flagMulti=1
         
         
