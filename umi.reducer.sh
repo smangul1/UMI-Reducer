@@ -28,6 +28,7 @@ ${dirSource}/tools/samtools-1.3/samtools index ${filename}_PCRduplicates_removed
 python ${dirSource}/genomic.categories.py --perCategory --mouse --multi ${filename}_PCRduplicates_removed.sort.bam ${filename}
 python ${dirSource}/mRNA.abundance.py --mouse ${filename}
 
+echo ${filename}
 
 
 
