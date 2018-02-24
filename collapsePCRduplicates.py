@@ -8,7 +8,7 @@ import argparse
 import matplotlib
 matplotlib.use('Agg') # Must be before importing matplotlib.pyplot or pylab!
 import matplotlib.pyplot as plt
-
+import os
 
 #updated 09/04/2015
 
@@ -42,28 +42,15 @@ args = ap.parse_args()
 
 bam=args.inbam
 out=args.outbam
-
-
+path=os.path.dirname(out)
+base=os.path.basename(out)
+prefix=os.path.splitext(base)[0]
 
 chr_list=[]
 
-if args.e:
-    for i in range(1,20):
-        chr_list.append('chr'+str(i))
 
-    chr_list.append('chrX')
-    chr_list.append('chrY')
-    chr_list.append('chrM')
 
-else:
-    for i in range(1,args.chr):
-        chr_list.append(str(i))
 
-    chr_list.append('X')
-    chr_list.append('Y')
-    chr_list.append('MT')
-
-print (chr)
 
 position=[]
 position_all_uniq=[]
@@ -72,8 +59,17 @@ position_all_uniq=[]
 
 
 
+
 samfile = pysam.Samfile(bam, "rb" )
 
+#extract chr names frm BAm file
+chr_list=[]
+for i in samfile.header['SQ']:
+    chr_list.append(i['SN'])
+
+
+print ("List of chromosomes extracted from BAM")
+print (chr_list)
 
 dict= {}
 
@@ -116,6 +112,9 @@ for chr in chr_list:
     dict.clear()
     position[:]=[]
 
+
+
+
     for read in samfile.fetch(chr):
         mappedReads.append(read.qname)
 
@@ -138,10 +137,12 @@ for chr in chr_list:
     print ("numberReadsUniquePlusMultiMapped",numberReadsUniquePlusMultiMapped)
 
 
+    print "------------"
+    print (position)
 
     counter_chr=collections.Counter(position)
     position_all_uniq+=position
-    print ("Number of position with #reads staring >=1", len(position))
+    print ("Number of position with #reads staring >=1", len(set(position)))
 
     count=0
 
@@ -151,7 +152,9 @@ for chr in chr_list:
         if count%10000==1:
             print (count)
         count+=1
-        
+
+        print key,val
+
         if val==1:
 
             for read in samfile.fetch(chr,key,key+1):
@@ -184,11 +187,13 @@ for chr in chr_list:
                         setReads.add(read.query_name.split("_")[1]+"_"+str(read.cigarstring))
                     #default format
                     else:
-                        setReads.add(read.query_name.split("_")[3]+"_"+read.cigarstring+"_"+str(read.reference_end))
+                        setReads.add(read.query_name.split("_")[3]+"_"+str(read.cigarstring))
 
 
 
-            
+            print setReads
+
+            #for example this is setReads: set(['ACA_31M_168', 'AAA_31M_168'])
 
             notsetReads=set()
             notsetReads.clear()
@@ -201,7 +206,7 @@ for chr in chr_list:
                     #default format
                 else:
                     extended_read_name=Read[i].query_name.split("_")[3]+"_"+Read[i].cigarstring
-
+                    print extended_read_name,setReads
 
 
 
@@ -223,9 +228,9 @@ for chr in chr_list:
 
                         readSet.add(Read[i].query_name)
 
+            
 
-
-                    
+print readSet
 
 outfile.close()
 
@@ -233,6 +238,11 @@ outfile.close()
 
 #-----------------------
 #statistics
+
+print ('sample')
+print ('Number of mapped reads',len(set(mappedReads)))
+print ('Number of reads mapped to unique location (UNIQUE reads)',numberReadsUniqueGlobal)
+print ('Number of reads after collapsing PCR dublicated (each read is present once)',len(readSet))
 
 
 header=[]
@@ -283,8 +293,7 @@ for key,val in counter_length_filtered.items():
     x1.append(key)
 
 
-
-plot1=out.split('.')[0]+'.readLengthPCRDuplicatesCollapsed.png'
+plot1=path+"/"+prefix+'.readLengthPCRDuplicatesCollapsed.png'
 print ("save to",plot1)
 
 
@@ -305,7 +314,14 @@ for key,val in counter_length.items():
     xbins2.append(val)
     x2.append(key)
 
-plot2=out.split('.')[0]+'.readLengthBeforePCRduplicates.png'
+
+
+
+
+
+print (path,prefix)
+
+plot2=path+"/"+prefix+'.readLengthBeforePCRduplicates.png'
 print ("save to",plot2)
 
 
