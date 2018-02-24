@@ -171,8 +171,8 @@ for chr in chr_list:
             setReads=set()
             setReads.clear()
     
-            if val>1000:
-                print (val, chr,key)
+
+
             Read=[]
             Read[:]=[]
             for read in samfile.fetch(chr,key,key+1):
