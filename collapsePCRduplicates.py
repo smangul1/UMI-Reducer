@@ -137,8 +137,6 @@ for chr in chr_list:
     print ("numberReadsUniquePlusMultiMapped",numberReadsUniquePlusMultiMapped)
 
 
-    print "------------"
-    print (position)
 
     counter_chr=collections.Counter(position)
     position_all_uniq+=position
@@ -153,7 +151,6 @@ for chr in chr_list:
             print (count)
         count+=1
 
-        print key,val
 
         if val==1:
 
@@ -191,7 +188,6 @@ for chr in chr_list:
 
 
 
-            print setReads
 
             #for example this is setReads: set(['ACA_31M_168', 'AAA_31M_168'])
 
@@ -206,7 +202,6 @@ for chr in chr_list:
                     #default format
                 else:
                     extended_read_name=Read[i].query_name.split("_")[3]+"_"+Read[i].cigarstring
-                    print extended_read_name,setReads
 
 
 
@@ -228,9 +223,9 @@ for chr in chr_list:
 
                         readSet.add(Read[i].query_name)
 
-            
 
-print readSet
+
+
 
 outfile.close()
 
@@ -239,7 +234,7 @@ outfile.close()
 #-----------------------
 #statistics
 
-print ('sample')
+
 print ('Number of mapped reads',len(set(mappedReads)))
 print ('Number of reads mapped to unique location (UNIQUE reads)',numberReadsUniqueGlobal)
 print ('Number of reads after collapsing PCR dublicated (each read is present once)',len(readSet))
@@ -255,7 +250,7 @@ header.append('Number of reads after collapsing PCR dublicated (each read is pre
 
 nr=[]
 
-nr.append(out.split('.')[0])
+nr.append(prefix.replace('_PCRduplicates_removed',''))
 nr.append(len(set(mappedReads)))
 nr.append(numberReadsUniqueGlobal)
 nr.append(len(readSet))
@@ -263,7 +258,7 @@ nr.append(len(readSet))
 
 
 
-stat_f=out.split('.')[0]+'.number_of_reads_stat'
+stat_f=path+"/"+prefix+'.number_of_reads_stat'
 print ("Save to ", stat_f)
 
 with open(stat_f, 'w') as fp:
@@ -319,7 +314,7 @@ for key,val in counter_length.items():
 
 
 
-print (path,prefix)
+
 
 plot2=path+"/"+prefix+'.readLengthBeforePCRduplicates.png'
 print ("save to",plot2)
