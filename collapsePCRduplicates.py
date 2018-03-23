@@ -20,6 +20,19 @@ def editDistance(s1,s2):
             k+=1
     return k
 
+def considerPos():
+	if args.end:
+		pos = str(read.reference_start)
+	else:
+		pos = str(read.cigarstring)
+	return pos
+
+def considerPos2():
+	if args.end:
+		pos = str(Read[i].reference_start)
+	else:
+		pos = str(Read[i].cigarstring)
+	return pos
 
 ap = argparse.ArgumentParser()
 ap.add_argument('inbam', help='Mapped reads in bam format')
@@ -28,7 +41,7 @@ ap.add_argument("--MAPQ",help="mapping quality to extract uniquely-mapped reads.
 ap.add_argument("--u",help="a binary flag used to indicate that only uniquely mapped reads will be considered. By default uniquely mapped reads are defined as reads with MAPQ=60",action="store_true")
 ap.add_argument("--chr",help="Number of autosomes. By default 20", default=20,type=int)
 ap.add_argument('--e', action='store_true',help='UMI-tools example format')
-
+ap.add_argument('--end',action='store_true',help='End position of read will not be considered')
 
 
 args = ap.parse_args()
@@ -181,10 +194,10 @@ for chr in chr_list:
 
                     #UMI-tools format
                     if args.e:
-                        setReads.add(read.query_name.split("_")[1]+"_"+str(read.cigarstring))
+                        setReads.add(read.query_name.split("_")[1]+"_"+considerPos())
                     #default format
                     else:
-                        setReads.add(read.query_name.split("_")[3]+"_"+str(read.cigarstring))
+                        setReads.add(read.query_name.split("_")[3]+"_"+considerPos())
 
 
 
@@ -198,10 +211,10 @@ for chr in chr_list:
 
                 #UMI-tools format
                 if args.e:
-                    extended_read_name=Read[i].query_name.split("_")[1]+"_"+Read[i].cigarstring
+                    extended_read_name=Read[i].query_name.split("_")[1]+"_"+considerPos2()
                     #default format
                 else:
-                    extended_read_name=Read[i].query_name.split("_")[3]+"_"+Read[i].cigarstring
+                    extended_read_name=Read[i].query_name.split("_")[3]+"_"+considerPos2()
 
 
 
@@ -214,10 +227,10 @@ for chr in chr_list:
 
                         #UMI-tools format
                         if args.e:
-                            notsetReads.add(Read[i].query_name.split("_")[1]+"_"+Read[i].cigarstring)
+                            notsetReads.add(Read[i].query_name.split("_")[1]+"_"+considerPos2())
                         #default format
                         else:
-                            notsetReads.add(Read[i].query_name.split("_")[3]+"_"+Read[i].cigarstring)
+                            notsetReads.add(Read[i].query_name.split("_")[3]+"_"+considerPos2())
 
 
 
@@ -261,10 +274,10 @@ nr.append(len(readSet))
 stat_f=path+"/"+prefix+'.number_of_reads_stat'
 print ("Save to ", stat_f)
 
-with open(stat_f, 'w') as fp:
-    a = csv.writer(fp, delimiter=',')
-    a.writerow(header)
-    a.writerow(nr)
+#with open(stat_f, 'w') as fp:
+   # a = csv.writer(fp, delimiter=',')
+   # a.writerow(header)
+   # a.writerow(nr)
 
 
 
@@ -296,7 +309,7 @@ print ("save to",plot1)
 plt.title('Length of reads after collapsing PCR duplicates')
 
 plt.bar(x1,xbins1)
-plt.savefig(plot1)
+#plt.savefig(plot1)
 
 
 
@@ -323,7 +336,7 @@ print ("save to",plot2)
 
 plt.title('Length before collapsing PCR duplicates')
 plt.bar(x2,xbins2)
-plt.savefig(plot2)
+#plt.savefig(plot2)
 
 
 samfile.close()
