@@ -581,14 +581,17 @@ for r in mReadsSet:
     weights = []
     weights[:] = []
 
-    if len(readDict[
-               r]) == 1:  # some reads were multi-mapped, but than got collapsed and now have flag 1 but are present in a single copy in [genomicFeature] file
-        out.write(
-            readDict[r][0][0] + "," + readDict[r][0][1] + "," + readDict[r][0][2] + "," + readDict[r][0][3] + "," +
-            readDict[r][0][4] + "," + readDict[r][0][5])
+    if len(readDict[r]) == 1:  # some reads were multi-mapped, but than got collapsed and now have flag 1 but are present in a single copy in [genomicFeature] file
+        out.write(readDict[r][0][0] + "," + readDict[r][0][1] + "," + readDict[r][0][2] + "," + readDict[r][0][3] + "," +readDict[r][0][4] + "," + readDict[r][0][5])
         out.write("\n")
 
+    #print "************",readDict[r]
+
     if len(readDict[r]) > 1:  # read is multi-mapped
+
+
+
+
 
         # print "==============="
         # print readDict[r], "MULTI-MAPPED"
@@ -600,41 +603,49 @@ for r in mReadsSet:
 
         irand = 0
 
-        if len(
-                genes) == 1 or "NA" in genes:  # read mapped to different location within the same gene OR genes vs intergenic
+        readDictT = []
+        readDictT[:] = []
+        readDictT=readDict[r]
 
-            # print "-->(1) Is mapped to different location within the same gene"
 
-            irand = random.randrange(0, len(readDict[r]))
 
+        if len(genes)==1 and 'NA' in genes: # it is only NA, which means those are intergenic
+            irand = random.randrange(0, len(readDictT))
 
 
 
         else:
 
-            listIndex = list(range(len(readDict[r])))
+            readDictT2 = []
+            readDictT2[:] = []
 
-            # print "-->(2)Is mapped to different genes"
+            for i in readDictT:
+                if i[3]!='NA':
+                    readDictT2.append(i)
 
-            for g in readDict[r]:
-                weights.append(abundanceGene[g[3]])
-
-            if sum(
-                    weights) == 0.0:  # in case read belongs to genrs with no uniq reads. As the results the freq of those genes is 0. And we can not do assigment based on freq of genes
-                # print "Sum is 0!"
-
-                norm = [float(1.0 / len(weights))] * len(weights)
+            if len(readDictT2)==1:
+                irand=0
             else:
-                norm = [float(i) / sum(weights) for i in weights]
 
-            weights = norm
+                listIndex = list(range(len(readDictT2)))
+                for g in readDictT2:
+                    weights.append(abundanceGene[g[3]])
 
-            irand = choice(listIndex, p=weights)
 
-        # print "We choose",irand,readDict[r][irand]
+                if sum(weights) == 0.0:  # in case read belongs to genes with no UNIQ reads. As the results the freq of those genes is 0. And we can not do assigment based on freq of genes
+                    norm = [float(1.0 / len(weights))] * len(weights)
+                else:
+                    norm = [float(i) / sum(weights) for i in weights]
 
-        out.write(readDict[r][irand][0] + "," + readDict[r][irand][1] + "," + readDict[r][irand][2] + "," +
-                  readDict[r][irand][3] + "," + readDict[r][irand][4] + "," + readDict[r][irand][5])
+                weights = norm
+
+                irand = choice(listIndex, p=weights)
+                readDictT=readDictT2
+
+                print weights,irand,readDictT
+
+
+        out.write(readDictT[irand][0] + "," + readDictT[irand][1] + "," + readDictT[irand][2] + "," +readDictT[irand][3] + "," + readDictT[irand][4] + "," + readDictT[irand][5])
         out.write("\n")
 
         # make sure to clean everething, as we fo to new chromosome
