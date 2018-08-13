@@ -566,7 +566,7 @@ with open(f_file, 'r') as f:
         readName = line[0]
         readDict[readName].append(line)
         # abundanceGene - we need this to calculate
-        if geneID != "NA" and flagM == 0 and category != "INTRON":
+        if geneID != "NA" and flagM == 0 and (category == "CDS" or category=="junction"):
             abundanceGene[geneID] += 1
         elif flagM == 0:
             reads_unique_not_used_counts += 1
@@ -587,10 +587,11 @@ for r in mReadsSet:
 
     #print "************",readDict[r]
 
-    if len(readDict[r]) > 1:  # read is multi-mapped
+    if len(readDict[r]) > 1:  #read is multi-mapped
 
 
-
+        print readDict[r]
+        sys.exit(1)
 
 
         # print "==============="
