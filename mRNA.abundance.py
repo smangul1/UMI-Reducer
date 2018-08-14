@@ -234,21 +234,20 @@ prefix=os.path.splitext(base)[0]
 
 
 
-#-------perCategory-------
-if args.perCategory:
+
     
     
     
-    dirOutPerCategory=args.out+"/"
-    if not os.path.exists(dirOutPerCategory):
+dirOutPerCategory=args.out+"/"
+if not os.path.exists(dirOutPerCategory):
         os.makedirs(dirOutPerCategory)
     
-    print ("Directory to save the results  ", dirOutPerCategory)
+print ("Directory to save the results  ", dirOutPerCategory)
     
-    f_file=dirOutPerCategory+prefix+".genomicFeature"
-    outFile = open(f_file, 'w' )
-    outFile.write('readName,chr,category, geneID, geneName, flag_multiMapped')
-    outFile.write('\n')
+f_file=dirOutPerCategory+prefix+".genomicFeature"
+outFile = open(f_file, 'w' )
+outFile.write('readName,chr,category, geneID, geneName, flag_multiMapped')
+outFile.write('\n')
 
 
 
@@ -440,29 +439,31 @@ for chr in chr_list:
         if read.get_tag("NH") != 1:
             flagMulti=1
         
-        
+
+
+
+
         
         if is_junction(read):
             feature=whichFeature(read,chr)
             if flagMulti==0:
                     #1943766_h_0_GCGGATC_GATC,13,CDS,ENSMUSG00000021782,Dlg5,0
-                    if args.perCategory:
-                        outFile.write( readName+','+chr + ',' + 'junction' + ',' + feature[1][0] + ',' + feature[1][1] + ',' + str(flagMulti)+'\n' )
+
+                    outFile.write( readName+','+chr + ',' + 'junction' + ',' + feature[1][0] + ',' + feature[1][1] + ',' + str(flagMulti)+'\n' )
         
             elif args.multi:
-                    if args.perCategory:
-                        outFile.write( readName+','+chr + ',' + 'junction' + ',' + feature[1][0] + ',' + feature[1][1] + ',' + str(flagMulti)+'\n' )
+                    outFile.write( readName+','+chr + ',' + 'junction' + ',' + feature[1][0] + ',' + feature[1][1] + ',' + str(flagMulti)+'\n' )
 
                 
     
         else:
             feature=whichFeature(read,chr)
             
-            if args.perCategory:
-                if flagMulti==0:
-                    outFile.write( readName+','+chr + ',' + feature[0] + ',' + feature[1][0] + ',' + feature[1][1] + ',' + str(flagMulti)+'\n' )
-                elif args.multi:
-                    outFile.write( readName+','+chr + ',' + feature[0] + ',' + feature[1][0] + ',' + feature[1][1] + ',' + str(flagMulti)+'\n' )
+
+            if flagMulti==0:
+                outFile.write( readName+','+chr + ',' + feature[0] + ',' + feature[1][0] + ',' + feature[1][1] + ',' + str(flagMulti)+'\n' )
+            elif args.multi:
+                outFile.write(readName+','+chr + ',' + feature[0] + ',' + feature[1][0] + ',' + feature[1][1] + ',' + str(flagMulti)+'\n' )
 
 outFile.close()
 
@@ -574,6 +575,10 @@ with open(f_file, 'r') as f:
 print("sum(abundanceGene.values()),reads_unique_not_used_counts", sum(abundanceGene.values()),
       reads_unique_not_used_counts)
 
+
+
+count_intergenic=0
+
 for r in mReadsSet:
 
     # read mapped to multiple locations of the same gene
@@ -590,8 +595,6 @@ for r in mReadsSet:
     if len(readDict[r]) > 1:  #read is multi-mapped
 
 
-        print readDict[r]
-        sys.exit(1)
 
 
         # print "==============="
@@ -599,8 +602,38 @@ for r in mReadsSet:
 
         genes = set()
         genes.clear()
+
+        readsList=[]
+        readsList[:]=[]
+
+
         for g in readDict[r]:
-            genes.add(g[3])
+            if g[2]=="CDS" or g[2]=="junction":
+                #if abundanceGene[g[3]]!=0:
+                readsList.append(g)
+
+
+
+        print readsList
+
+        irand = 0
+        if len(readsList)==1: #only one read from CDS left
+            out.write(
+                readDictT[irand][0] + "," + readDictT[irand][1] + "," + readDictT[irand][2] + "," + readDictT[irand][
+                    3] + "," + readDictT[irand][4] + "," + readDictT[irand][5])
+            out.write("\n")
+        elif len(readsList)>1:
+            listIndex = list(range(len(readsList)))
+            for g in readsList:
+                weights.append(abundanceGene[g[3]])
+            print weights
+            norm = [float(i) / sum(weights) for i in weights]
+            weights = norm
+            irand = choice(listIndex, p=weights)
+            out.write(readDictT[irand][0] + "," + readDictT[irand][1] + "," + readDictT[irand][2] + "," +readDictT[irand][3] + "," + readDictT[irand][4] + "," + readDictT[irand][5])
+            out.write("\n")
+
+
 
         irand = 0
 
@@ -610,12 +643,10 @@ for r in mReadsSet:
 
 
 
-        if len(genes)==1 and 'NA' in genes: # it is only NA, which means those are intergenic
-            irand = random.randrange(0, len(readDictT))
 
 
 
-        else:
+        if 1==2:
 
             readDictT2 = []
             readDictT2[:] = []
