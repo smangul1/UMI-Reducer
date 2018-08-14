@@ -5,12 +5,15 @@ import numpy as np
 import random
 import csv
 import argparse
-import matplotlib
-matplotlib.use('Agg') # Must be before importing matplotlib.pyplot or pylab!
-import matplotlib.pyplot as plt
+#import matplotlib
+#matplotlib.use('Agg') # Must be before importing matplotlib.pyplot or pylab!
+#import matplotlib.pyplot as plt
 import os
 
 #updated 09/04/2015
+
+
+
 
 
 def editDistance(s1,s2):
@@ -306,9 +309,9 @@ print ("save to",plot1)
 
 
 
-plt.title('Length of reads after collapsing PCR duplicates')
+#plt.title('Length of reads after collapsing PCR duplicates')
 
-plt.bar(x1,xbins1)
+#plt.bar(x1,xbins1)
 #plt.savefig(plot1)
 
 
@@ -329,13 +332,13 @@ for key,val in counter_length.items():
 
 
 
-plot2=path+"/"+prefix+'.readLengthBeforePCRduplicates.png'
-print ("save to",plot2)
+#plot2=path+"/"+prefix+'.readLengthBeforePCRduplicates.png'
+#print ("save to",plot2)
 
 
 
-plt.title('Length before collapsing PCR duplicates')
-plt.bar(x2,xbins2)
+#plt.title('Length before collapsing PCR duplicates')
+#plt.bar(x2,xbins2)
 #plt.savefig(plot2)
 
 
