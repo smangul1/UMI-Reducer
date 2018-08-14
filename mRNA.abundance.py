@@ -590,7 +590,6 @@ for r in mReadsSet:
         out.write(readDict[r][0][0] + "," + readDict[r][0][1] + "," + readDict[r][0][2] + "," + readDict[r][0][3] + "," +readDict[r][0][4] + "," + readDict[r][0][5])
         out.write("\n")
 
-    #print "************",readDict[r]
 
     if len(readDict[r]) > 1:  #read is multi-mapped
 
@@ -609,76 +608,40 @@ for r in mReadsSet:
 
         for g in readDict[r]:
             if g[2]=="CDS" or g[2]=="junction":
-                #if abundanceGene[g[3]]!=0:
-                readsList.append(g)
+                if abundanceGene[g[3]]!=0:
+                    readsList.append(g)
 
 
 
-        print readsList
 
         irand = 0
         if len(readsList)==1: #only one read from CDS left
             out.write(
-                readDictT[irand][0] + "," + readDictT[irand][1] + "," + readDictT[irand][2] + "," + readDictT[irand][
-                    3] + "," + readDictT[irand][4] + "," + readDictT[irand][5])
+                readsList[irand][0] + "," + readsList[irand][1] + "," + readsList[irand][2] + "," + readsList[irand][
+                    3] + "," + readsList[irand][4] + "," + readsList[irand][5])
             out.write("\n")
         elif len(readsList)>1:
             listIndex = list(range(len(readsList)))
             for g in readsList:
                 weights.append(abundanceGene[g[3]])
-            print weights
+            print (weights)
             norm = [float(i) / sum(weights) for i in weights]
             weights = norm
             irand = choice(listIndex, p=weights)
-            out.write(readDictT[irand][0] + "," + readDictT[irand][1] + "," + readDictT[irand][2] + "," +readDictT[irand][3] + "," + readDictT[irand][4] + "," + readDictT[irand][5])
+            print ("irand",irand)
+            out.write(readsList[irand][0] + "," + readsList[irand][1] + "," + readsList[irand][2] + "," +readsList[irand][3] + "," + readsList[irand][4] + "," + readsList[irand][5])
             out.write("\n")
 
 
 
-        irand = 0
-
-        readDictT = []
-        readDictT[:] = []
-        readDictT=readDict[r]
 
 
 
 
 
 
-        if 1==2:
-
-            readDictT2 = []
-            readDictT2[:] = []
-
-            for i in readDictT:
-                if i[3]!='NA':
-                    readDictT2.append(i)
-
-            if len(readDictT2)==1:
-                irand=0
-            else:
-
-                listIndex = list(range(len(readDictT2)))
-                for g in readDictT2:
-                    weights.append(abundanceGene[g[3]])
 
 
-                if sum(weights) == 0.0:  # in case read belongs to genes with no UNIQ reads. As the results the freq of those genes is 0. And we can not do assigment based on freq of genes
-                    norm = [float(1.0 / len(weights))] * len(weights)
-                else:
-                    norm = [float(i) / sum(weights) for i in weights]
-
-                weights = norm
-
-                irand = choice(listIndex, p=weights)
-                readDictT=readDictT2
-
-                print weights,irand,readDictT
-
-
-        out.write(readDictT[irand][0] + "," + readDictT[irand][1] + "," + readDictT[irand][2] + "," +readDictT[irand][3] + "," + readDictT[irand][4] + "," + readDictT[irand][5])
-        out.write("\n")
 
         # make sure to clean everething, as we fo to new chromosome
 
