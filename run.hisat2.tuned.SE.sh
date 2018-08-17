@@ -22,7 +22,6 @@ index="/u/home/s/serghei/project/umi-reducer_NCBIM37/genome"
 if [ $# -lt 2 ]
     then
     echo "********************************************************************"
-    echo "Script was written for project : Comprehensive analysis of RNA-sequencing to find the source of 1 trillion reads across diverse adult human tissues"
     echo "This script was written by Serghei Mangul"
     echo "********************************************************************"
     echo ""
@@ -33,6 +32,13 @@ if [ $# -lt 2 ]
     exit 1
     fi
 
+
+DIR_CODE=`dirname $(readlink -f "$0")`
+
+if [ -d "$DIR_CODE/tools/MiniConda/bin" ]; then
+    echo "Add MiniConda to PATH if it's available"
+    export PATH="$DIR_CODE/tools/MiniConda/bin:$PATH"
+fi
 
 
 # mandatory part
@@ -77,9 +83,9 @@ res1=$(date +%s.%N)
 $toolPath -x $index -U $input1 --end-to-end -N 1 -L 20 -i S,1,0.5 -D 25 -R 5 --pen-noncansplice 12 --mp 1,0 --sp 3,0 --time --reorder | ${DIR}/tools/samtools-1.3/samtools view -F 4 -bS - >$outdir/$(basename ${input1%.*}).bam 2>>$logfile
 
 
-${DIR}/tools/samtools-1.3/samtools sort $outdir/$(basename ${input1%.*}).bam >$outdir/$(basename ${input1%.*}).sort.bam
+samtools sort $outdir/$(basename ${input1%.*}).bam >$outdir/$(basename ${input1%.*}).sort.bam
 rm -fr $outdir/${toolName}_$(basename ${input1%.*}).bam
-${DIR}/tools/samtools-1.3/samtools index $outdir/$(basename ${input1%.*}).sort.bam
+samtools index $outdir/$(basename ${input1%.*}).sort.bam
 
 #tools/samtools-1.3/samtools view -f 0x4 -bh $outdir/${toolName}_$(basename ${input1%.*}).bam | samtools bam2fq - >$outdir/${toolName}_$(basename ${input1%.*})_unmapped.fastq 2>>$logfile
 
