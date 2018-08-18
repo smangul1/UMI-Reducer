@@ -285,64 +285,40 @@ print ("Save to ", stat_f)
 
 
 
+samfile.close()
+
+
+print "Create a new BAM file", args.outbam
+
+
 counter=collections.Counter(position_all_uniq)
 position_all_uniq=set(position_all_uniq)
 print ("Number of position with #reads staring >=1", len(position_all_uniq))
 
 
 
-
-#-----------------------
-#save as a histogram - counter_length_filtered
-
-x1=[]
-xbins1=[]
-
-counter_length_filtered=collections.Counter(readLength_filtered)
-for key,val in counter_length_filtered.items():
-    xbins1.append(val)
-    x1.append(key)
-
-
-plot1=path+"/"+prefix+'.readLengthPCRDuplicatesCollapsed.png'
-print ("save to",plot1)
+plot1=path+"/"+prefix+'.readLength.csv'
+print ("Save to",plot1)
 
 
 
-#plt.title('Length of reads after collapsing PCR duplicates')
+f=open(plot1, "w")
+f.write("flag,l"+"\n")
+    
+for l in readLength_filtered:
+    f.write("PCRDuplicatesCollapsed,"+str(l) +"\n")
 
-#plt.bar(x1,xbins1)
-#plt.savefig(plot1)
+f.close()
 
 
-
-#save as a histogram - counter_length_uniq
-x2=[]
-xbins2=[]
-
-counter_length=collections.Counter(readLength)
-for key,val in counter_length.items():
-    xbins2.append(val)
-    x2.append(key)
+f=open(plot1, "a")
+for l in readLength_filtered:
+    f.write("BeforePCRduplicates,"+str(l) +"\n")
 
 
 
 
 
-
-
-
-#plot2=path+"/"+prefix+'.readLengthBeforePCRduplicates.png'
-#print ("save to",plot2)
-
-
-
-#plt.title('Length before collapsing PCR duplicates')
-#plt.bar(x2,xbins2)
-#plt.savefig(plot2)
-
-
-samfile.close()
 
 
 print ("DONE!")

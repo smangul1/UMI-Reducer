@@ -10,7 +10,7 @@ AUTHOR="Serghei Mangul"
 
 toolName="hisat2.tuned"
 toolPath="/u/home/s/svandrie/code/import/hisat2-2.1.0/hisat2"
-index="/u/home/s/serghei/project/umi-reducer_NCBIM37/genome"
+index="/u/home/s/serghei/project/mouse/hisat2/UMI.Reducer.hisat2.grcm38/genome"
 
 #index="/u/home/h/harryyan/project-eeskin/utilities/hisat2-2.1.0/ref_genome/grch38/genome"
 
@@ -27,7 +27,7 @@ if [ $# -lt 2 ]
     echo ""
     echo "1 <input>   - R.fastq"
     #echo "2 <input2>   - R2.fastq"
-    echo "1 <outdir>  - dir to save the output"
+    echo "2 <outdir>  - dir to save the output"
     echo "--------------------------------------"
     exit 1
     fi
@@ -47,6 +47,10 @@ input1=$1
 outdir=$2
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
+
+#Convert to absolute paths.
+input1=`readlink -m "$input1"`
+outdir=`readlink -m "$outdir"`
 
 # STEP 0 - create output directory if it does not exist
 
@@ -80,7 +84,8 @@ res1=$(date +%s.%N)
 . /u/local/Modules/default/init/modules.sh
 #module load samtools
 
-$toolPath -x $index -U $input1 --end-to-end -N 1 -L 20 -i S,1,0.5 -D 25 -R 5 --pen-noncansplice 12 --mp 1,0 --sp 3,0 --time --reorder | ${DIR}/tools/samtools-1.3/samtools view -F 4 -bS - >$outdir/$(basename ${input1%.*}).bam 2>>$logfile
+
+hisat2 -x $index -U $input1 --end-to-end -N 1 -L 20 -i S,1,0.5 -D 25 -R 5 --pen-noncansplice 12 --mp 1,0 --sp 3,0 --time --reorder | samtools view -F 4 -bS - >$outdir/$(basename ${input1%.*}).bam 2>>$logfile
 
 
 samtools sort $outdir/$(basename ${input1%.*}).bam >$outdir/$(basename ${input1%.*}).sort.bam

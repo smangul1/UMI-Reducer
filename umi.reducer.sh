@@ -30,6 +30,12 @@ echo "Start analysis"
 
 #collapsePCRduplicates.py
 python ${dirSource}/collapsePCRduplicates.py  ${BAM} ${filename}_PCRduplicates_removed.bam
+
+. /u/local/Modules/default/init/modules.sh
+module load R
+Rscript  ${dirSource}/read.length.R ${filename}_PCRduplicates_removed.readLength.csv ${filename}_PCRduplicates_removed.readLength.pdf
+  
+
 samtools sort ${filename}_PCRduplicates_removed.bam >${filename}_PCRduplicates_removed.sort.bam
 
 rm ${filename}_PCRduplicates_removed.bam
