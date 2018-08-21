@@ -312,7 +312,7 @@ f.close()
 
 
 f=open(plot1, "a")
-for l in readLength_filtered:
+for l in readLength:
     f.write("BeforePCRduplicates,"+str(l) +"\n")
 
 

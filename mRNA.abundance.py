@@ -169,7 +169,6 @@ def find(start, end, tree):
 ap = argparse.ArgumentParser()
 ap.add_argument('bam', help='sorted bam file with mapped reads')
 ap.add_argument('out', help='file to save the number of reads per genome category')
-ap.add_argument("--perCategory", help="reports the assigment for each read. A separate file per chromosome will be created. In case --perCategory was choosen this will be directory to sabve results",action="store_true")
 ap.add_argument("--mouse", help="Use mouse genome annotations (NCBIM37). Default is human",action="store_true")
 ap.add_argument("--multi", help="Categories all copies of multi-mapped reads, they will have a special flag to futher assign according to transcript abundance ",action="store_true")
 args = ap.parse_args()
