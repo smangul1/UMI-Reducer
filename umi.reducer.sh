@@ -44,7 +44,7 @@ samtools index ${filename}_PCRduplicates_removed.sort.bam
 echo "Run genomic.categories.py ..."
 
 
-python ${dirSource}/mRNA.abundance.py --perCategory --mouse --multi ${filename}_PCRduplicates_removed.sort.bam ${filename}
+python ${dirSource}/mRNA.abundance.py --mouse --multi ${filename}_PCRduplicates_removed.sort.bam ${filename}
 
 
 
