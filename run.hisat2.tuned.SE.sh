@@ -10,7 +10,8 @@ AUTHOR="Serghei Mangul"
 
 toolName="hisat2.tuned"
 toolPath="/u/home/s/svandrie/code/import/hisat2-2.1.0/hisat2"
-index="/u/home/s/serghei/project/mouse/hisat2/UMI.Reducer.hisat2.grcm38/genome"
+index=/u/home/s/svandrie/project-kmartin/Mus_musculus/NCBI/build37.2/Sequence/hisat2/Mus.musculus.build37.2.hisat2.index
+
 
 #index="/u/home/h/harryyan/project-eeskin/utilities/hisat2-2.1.0/ref_genome/grch38/genome"
 
