@@ -606,7 +606,7 @@ for r in mReadsSet:
 
 
         for g in readDict[r]:
-            if g[2]=="CDS" or g[2]=="junction":
+            if (g[2]=="CDS" or g[2]=="junction") and geneID != "NA":
                 if abundanceGene[g[3]]!=0:
                     readsList.append(g)
 
